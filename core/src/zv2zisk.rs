@@ -9,6 +9,8 @@ use std::collections::HashMap;
 
 const CAUSE_EXIT: u64 = 93;
 const CAUSE_KECCAK: u64 = 0x00_01_01_01;
+const CAUSE_ADD_256: u64 = 0x00_02_01_01;
+const CAUSE_ADDC_256: u64 = 0x00_02_02_01;
 const CSR_ADDR: u64 = SYS_ADDR + 0x8000;
 const MTVEC: u64 = CSR_ADDR + 0x305;
 const M64: u64 = 0xFFFFFFFFFFFFFFFF;
@@ -1586,13 +1588,59 @@ pub fn add_entry_exit_jmp(rom: &mut ZiskRom, addr: u64) {
     zib.src_a("reg", 11, false);
     zib.src_b("imm", 0, false);
     zib.op("keccak").unwrap();
-    zib.j(4, 4);
+    zib.j(20, 20);
     zib.verbose("keccak");
     zib.build();
     rom.insts.insert(rom.next_init_inst_addr, zib);
     rom.next_init_inst_addr += 4;
 
-    // :0048
+    // :0048 trap_handle
+    // If register a7==CAUSE_ARITH_ADD, call the arith_add opcode and return
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 17, false);
+    zib.src_b("imm", CAUSE_ADD_256, false);
+    zib.op("eq").unwrap();
+    zib.j(4, 8);
+    zib.verbose(&format!("beq r17, {} # Check if is add_256", CAUSE_ADD_256));
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :004c
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 11, false);
+    zib.src_b("imm", 0, false);
+    zib.op("add_256").unwrap();
+    zib.j(12, 12);
+    zib.verbose("add_256");
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0050 trap_handle
+    // If register a7==CAUSE_ADD_C_256, call the add_c_256 opcode and return
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 17, false);
+    zib.src_b("imm", CAUSE_ADDC_256, false);
+    zib.op("eq").unwrap();
+    zib.j(4, 8);
+    zib.verbose(&format!("beq r17, {} # Check if is addc_256", CAUSE_ADDC_256));
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0054
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 11, false);
+    zib.src_b("imm", 0, false);
+    zib.op("addc_256").unwrap();
+    zib.j(4, 4);
+    zib.verbose("addc_256");
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0058
     let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
     zib.src_a("imm", 0, false);
     zib.src_b("reg", 1, false);

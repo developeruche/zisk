@@ -19,6 +19,7 @@ json = "0.12.4"
 elf = "0.7.4"
 riscv = { path = "../riscv" }
 tiny-keccak = { version = "2.0.2", features = ["keccak"] }
+crypto-bigint = "0.5.5"
 
 [features]
 default = []

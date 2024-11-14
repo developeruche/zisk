@@ -9,3 +9,5 @@ edition = "2021"
 lazy_static = "1.5.0"
 rand = "0.8.5"
 getrandom = { version = "0.2", features = ["custom"] }
+crypto-bigint = { path = "../../../zisk-crypto-bigint" }
+

@@ -2,6 +2,8 @@
 
 #![allow(unused)]
 
+use crate::{InstContext, ZiskOperationType, ZiskRequiredOperation, SYS_ADDR};
+use crypto_bigint::U256;
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
@@ -10,7 +12,7 @@ use std::{
 };
 use tiny_keccak::keccakf;
 
-use crate::{InstContext, ZiskOperationType, ZiskRequiredOperation, SYS_ADDR};
+const U256_WORDS: usize = 4;
 
 /// Determines the type of a [`ZiskOp`]
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -22,6 +24,7 @@ pub enum OpType {
     Binary,
     BinaryE,
     Keccak,
+    Binary256,
     PubOut,
 }
 
@@ -33,6 +36,7 @@ impl From<OpType> for ZiskOperationType {
             OpType::Binary => ZiskOperationType::Binary,
             OpType::BinaryE => ZiskOperationType::BinaryE,
             OpType::Keccak => ZiskOperationType::Keccak,
+            OpType::Binary256 => ZiskOperationType::Binary256,
             OpType::PubOut => ZiskOperationType::PubOut,
         }
     }
@@ -48,6 +52,7 @@ impl Display for OpType {
             Self::Binary => write!(f, "b"),
             Self::BinaryE => write!(f, "BinaryE"),
             Self::Keccak => write!(f, "Keccak"),
+            Self::Binary256 => write!(f, "Binary256"),
             Self::PubOut => write!(f, "PubOut"),
         }
     }
@@ -269,6 +274,8 @@ define_ops! {
     (MaxuW, "maxu_w", Binary, 77, 0x1b, opc_maxu_w, op_maxu_w),
     (MaxW, "max_w", Binary, 77, 0x1c, opc_max_w, op_max_w),
     (Keccak, "keccak", Keccak, 77, 0xf1, opc_keccak, op_keccak),
+    (Add256, "add_256", Binary256, 77, 0xf2, opc_add_256, op_add_256),
+    (AddC256, "addc_256", Binary256, 77, 0xf3, opc_addc_256, op_addc_256),
     (PubOut, "pubout", PubOut, 77, 0x30, opc_pubout, op_pubout), // TODO: New type
 }
 
@@ -874,6 +881,90 @@ pub fn opc_keccak(ctx: &mut InstContext) {
 #[inline(always)]
 pub fn op_keccak(_a: u64, _b: u64) -> (u64, bool) {
     unimplemented!("op_keccak() is not implemented");
+}
+
+#[inline(always)]
+pub fn opc_add_256(ctx: &mut InstContext) {
+    // Get address from register a1 = x11
+    let address = ctx.mem.read(SYS_ADDR + 10_u64 * 8, 8);
+
+    // a value
+    let mut a = [0_u64; U256_WORDS];
+    for (i, d) in a.iter_mut().enumerate() {
+        *d = ctx.mem.read(address + (8 * i as u64), 8);
+    }
+    let a = U256::from(a);
+
+    // b value
+    let mut b = [0_u64; U256_WORDS];
+    for (i, d) in b.iter_mut().enumerate() {
+        *d = ctx.mem.read(address + (8 * (i + 4) as u64), 8);
+    }
+    let b = U256::from(b);
+
+    // p value
+    let mut p = [0_u64; U256_WORDS];
+    for (i, d) in p.iter_mut().enumerate() {
+        *d = ctx.mem.read(address + (8 * (i + 8) as u64), 8);
+    }
+    let p = U256::from(p);
+
+    let r: [u64; U256_WORDS] = a.add_mod(&b, &p).into();
+
+    // Write the result r
+    for (i, d) in r.iter().enumerate() {
+        ctx.mem.write(address + (8 * i as u64), *d, 8);
+    }
+
+    ctx.c = 0;
+    ctx.flag = false;
+}
+
+#[inline(always)]
+pub fn op_add_256(_a: u64, _b: u64) -> (u64, bool) {
+    unimplemented!("op_add_256) is not implemented");
+}
+
+#[inline(always)]
+pub fn opc_addc_256(ctx: &mut InstContext) {
+    // Get address from register a1 = x11
+    let address = ctx.mem.read(SYS_ADDR + 10_u64 * 8, 8);
+
+    // a value
+    let mut a = [0_u64; U256_WORDS];
+    for (i, d) in a.iter_mut().enumerate() {
+        *d = ctx.mem.read(address + (8 * i as u64), 8);
+    }
+    let a = U256::from(a);
+
+    // b value
+    let mut b = [0_u64; U256_WORDS];
+    for (i, d) in b.iter_mut().enumerate() {
+        *d = ctx.mem.read(address + (8 * (i + 4) as u64), 8);
+    }
+    let b = U256::from(b);
+
+    // carry value
+    let mut carry = ctx.mem.read(address + (8 * 8 as u64), 8);
+
+    let (result, new_carry) = a.adc(&b, carry.into());
+    let r: [u64; U256_WORDS] = result.into();
+
+    // Write result into a parameter
+    for (i, d) in r.iter().enumerate() {
+        ctx.mem.write(address + (8 * i as u64), *d, 8);
+    }
+
+    // Write new_carry into carry parameter
+    ctx.mem.write(address + (8 * 8 as u64), new_carry.into(), 8);
+
+    ctx.c = 0;
+    ctx.flag = false;
+}
+
+#[inline(always)]
+pub fn op_addc_256(_a: u64, _b: u64) -> (u64, bool) {
+    unimplemented!("op_add_c_256) is not implemented");
 }
 
 impl From<ZiskRequiredOperation> for ZiskOp {
