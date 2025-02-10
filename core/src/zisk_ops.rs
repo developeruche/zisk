@@ -33,6 +33,7 @@ pub enum OpType {
     Binary,
     BinaryE,
     Keccak,
+    Secp256k1,
     PubOut,
 }
 
@@ -44,6 +45,7 @@ impl From<OpType> for ZiskOperationType {
             OpType::Binary => ZiskOperationType::Binary,
             OpType::BinaryE => ZiskOperationType::BinaryE,
             OpType::Keccak => ZiskOperationType::Keccak,
+            OpType::Secp256k1 => ZiskOperationType::Secp256k1,
             OpType::PubOut => ZiskOperationType::PubOut,
         }
     }
@@ -59,6 +61,7 @@ impl Display for OpType {
             Self::Binary => write!(f, "b"),
             Self::BinaryE => write!(f, "BinaryE"),
             Self::Keccak => write!(f, "Keccak"),
+            Self::Secp256k1 => write!(f, "Secp256k1"),
             Self::PubOut => write!(f, "PubOut"),
         }
     }
@@ -76,6 +79,7 @@ impl FromStr for OpType {
             "b" => Ok(Self::Binary),
             "be" => Ok(Self::BinaryE),
             "k" => Ok(Self::Keccak),
+            "secp" => Ok(Self::Secp256k1),
             _ => Err(InvalidOpTypeError),
         }
     }
@@ -284,7 +288,9 @@ define_ops! {
     (MaxuW, "maxu_w", Binary, 77, 0x24, opc_maxu_w, op_maxu_w),
     (MaxW, "max_w", Binary, 77, 0x25, opc_max_w, op_max_w),
     (Keccak, "keccak", Keccak, 77, 0xf1, opc_keccak, op_keccak),
-    (PubOut, "pubout", PubOut, 77, 0x30, opc_pubout, op_pubout),
+    (Secp256k1Add, "secp256k1_add", Secp256k1, 77, 0xf2, opc_secp256k1_add, op_secp256k1_add),
+    (Secp256k1Double, "secp256k1_double", Secp256k1, 77, 0xf3, opc_secp256k1_double, op_secp256k1_double),
+    (PubOut, "pubout", PubOut, 77, 0x30, opc_pubout, op_pubout), // TODO: New type
 }
 
 /* INTERNAL operations */
@@ -1079,6 +1085,64 @@ pub fn opc_keccak(ctx: &mut InstContext) {
 #[inline(always)]
 pub fn op_keccak(_a: u64, _b: u64) -> (u64, bool) {
     unimplemented!("op_keccak() is not implemented");
+}
+
+#[inline(always)]
+pub fn op_secp256k1_add(_a: u64, _b: u64) -> (u64, bool) {
+    unimplemented!("op_secp256k1_add() is not implemented");
+}
+
+#[inline(always)]
+pub fn opc_secp256k1_add(ctx: &mut InstContext) {
+    println!("opc_secp256k1_add");
+    // // Get address from register a1 = x11
+    // let address = ctx.mem.read(SYS_ADDR + 10_u64 * 8, 8);
+
+    // // Allocate room for 12 u64 = 96 bytes = 768 bits
+    // const WORDS: usize = 4;
+    // let mut a = [0_u64; WORDS];
+    // let mut b = [0_u64; WORDS];
+    // let mut p = [0_u64; WORDS];
+
+    // // a value
+    // for (i, d) in a.iter_mut().enumerate() {
+    //     *d = ctx.mem.read(address + (8 * i as u64), 8);
+    // }
+    // let a = U256::from(a);
+
+    // // b value
+    // for (i, d) in b.iter_mut().enumerate() {
+    //     *d = ctx.mem.read(address + (8 * (i + 4) as u64), 8);
+    // }
+    // let b = U256::from(b);
+
+    // // p value
+    // for (i, d) in p.iter_mut().enumerate() {
+    //     *d = ctx.mem.read(address + (8 * (i + 8) as u64), 8);
+    // }
+    // let p = U256::from(p);
+
+    // a.add_mod(&b, &p);
+
+    // let a: [u64; WORDS] = a.into();
+
+    // // Write them from the address
+    // for (i, d) in a.iter().enumerate() {
+    //     ctx.mem.write(address + (8 * i as u64), *d, 8);
+    // }
+
+    // ctx.c = 0;
+    // ctx.flag = false;
+}
+
+#[inline(always)]
+pub fn op_secp256k1_double(_a: u64, _b: u64) -> (u64, bool) {
+    unimplemented!("op_secp256k1_double() is not implemented");
+}
+
+#[inline(always)]
+pub fn opc_secp256k1_double(ctx: &mut InstContext) {
+    println!("opc_secp256k1_double");
 }
 
 impl From<ZiskRequiredOperation> for ZiskOp {

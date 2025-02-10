@@ -13,6 +13,8 @@ use std::collections::HashMap;
 
 const CAUSE_EXIT: u64 = 93;
 const CAUSE_KECCAK: u64 = 0x00_01_01_01;
+const CAUSE_SECP256K1_ADD: u64 = 0x00_02_01_01;
+const CAUSE_SECP256K1_DOUBLE: u64 = 0x00_02_02_01;
 const CSR_ADDR: u64 = SYS_ADDR + 0x8000;
 const MTVEC: u64 = CSR_ADDR + 0x305;
 const M64: u64 = 0xFFFFFFFFFFFFFFFF;
@@ -1688,13 +1690,59 @@ pub fn add_entry_exit_jmp(rom: &mut ZiskRom, addr: u64) {
     zib.src_a("reg", 11, false);
     zib.src_b("imm", 0, false);
     zib.op("keccak").unwrap();
-    zib.j(4, 4);
+    zib.j(20, 20);
     zib.verbose("keccak");
     zib.build();
     rom.insts.insert(rom.next_init_inst_addr, zib);
     rom.next_init_inst_addr += 4;
 
-    // :0044
+    // :0048 trap_handle
+    // If register a7==CAUSE_SECP256K1_ADD, call the secp256k1_add opcode and return
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 17, false);
+    zib.src_b("imm", CAUSE_SECP256K1_ADD, false);
+    zib.op("eq").unwrap();
+    zib.j(4, 8);
+    zib.verbose(&format!("beq r17, {} # Check if is secp256k1_add", CAUSE_SECP256K1_ADD));
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0052 secp256k1_add
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 11, false);
+    zib.src_b("imm", 0, false);
+    zib.op("secp256k1_add").unwrap();
+    zib.j(12, 12);
+    zib.verbose("secp256k1_add");
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0048 trap_handle
+    // If register a7==CAUSE_SECP256K1_DOUBLE, call the secp256k1_double opcode and return
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 17, false);
+    zib.src_b("imm", CAUSE_SECP256K1_DOUBLE, false);
+    zib.op("eq").unwrap();
+    zib.j(4, 8);
+    zib.verbose(&format!("beq r17, {} # Check if is secp256k1_double", CAUSE_SECP256K1_DOUBLE));
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0052 secp256k1_double
+    let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
+    zib.src_a("reg", 11, false);
+    zib.src_b("imm", 0, false);
+    zib.op("secp256k1_double").unwrap();
+    zib.j(4, 4);
+    zib.verbose("secp256k1_double");
+    zib.build();
+    rom.insts.insert(rom.next_init_inst_addr, zib);
+    rom.next_init_inst_addr += 4;
+
+    // :0056
     // Return to the instruction next to the one that made this ecall
     let mut zib = ZiskInstBuilder::new(rom.next_init_inst_addr);
     zib.src_a("imm", 0, false);

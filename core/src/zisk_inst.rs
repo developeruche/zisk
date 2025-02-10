@@ -70,10 +70,11 @@ pub enum ZiskOperationType {
     Binary,
     BinaryE,
     Keccak,
+    Secp256k1,
     PubOut,
 }
 
-pub const ZISK_OP_TYPE_COUNT: usize = 7;
+pub const ZISK_OP_TYPE_COUNT: usize = 8;
 
 /// ZisK instruction definition
 ///

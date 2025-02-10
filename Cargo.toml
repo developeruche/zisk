@@ -17,6 +17,7 @@ members = [
     "state-machines/std",
     "witness-computation",
     "ziskos/entrypoint",
+    "ziskos/precompiles",
 ]
 
 resolver = "2"

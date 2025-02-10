@@ -50,18 +50,22 @@
                 "filter": {
                     "name": "ziskemu",
                     "kind": "bin"
+                },
+                "env": {
+                    "RUSTFLAGS": "-L native=/home/agnusmor/git/pil2-proofman/pil2-stark/lib"
                 }
             },
             "args": [
                 "-e",
-                "emulator/benches/data/my.elf",
+                "zisk-eth-test",
                 "-i",
-                "emulator/benches/data/input.bin",
+                "input.bin",
                 "-c",
                 "-m",
                 "-x",
+                //"-l",
             ],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",         
         },
         {
             "type": "lldb",
