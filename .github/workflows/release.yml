@@ -143,9 +143,10 @@ jobs:
         id: rustc-toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable
           profile: minimal
           override: true
+          default: true
           targets: ${{ matrix.target }}
 
       - uses: Swatinem/rust-cache@v2
