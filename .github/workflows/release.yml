@@ -116,17 +116,17 @@ jobs:
             libomp-dev libgmp-dev nasm libsodium-dev cmake openmpi-bin \
             openmpi-common libopenmpi-dev
 
-      - name: Install Intel OpenMP
-        shell: bash
-        run: |
-          # download the key to system keyring
-          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
-          | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+      # - name: Install Intel OpenMP
+      #   shell: bash
+      #   run: |
+      #     # download the key to system keyring
+      #     wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+      #     | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
 
-          # add signed entry to apt sources and configure the APT client to use Intel repository:
-          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update
-          sudo apt-get install -y intel-oneapi-openmp
+      #     # add signed entry to apt sources and configure the APT client to use Intel repository:
+      #     echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+      #     sudo apt-get update
+      #     sudo apt-get install -y intel-oneapi-openmp
 
       - name: Install rust toolchain
         id: rustc-toolchain
@@ -176,49 +176,50 @@ jobs:
           uname -a
           lsb_release -a || true
 
-          # Debug: Check if libiomp5.so is installed
-          echo "🔍 Searching for libiomp5.so on the system..."
-          IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
+          # # Debug: Check if libiomp5.so is installed
+          # echo "🔍 Searching for libiomp5.so on the system..."
+          # IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
 
-          if [ -z "$IOMP5_PATH" ]; then
-            echo "❌ libiomp5.so not found on the system!"
-            echo "Attempting to list Intel OpenMP installation..."
-            dpkg -l | grep intel || echo "Intel OpenMP package not found."
-            exit 1
-          else
-            echo "✅ Found libiomp5.so at: $IOMP5_PATH"
-          fi
+          # if [ -z "$IOMP5_PATH" ]; then
+          #   echo "❌ libiomp5.so not found on the system!"
+          #   echo "Attempting to list Intel OpenMP installation..."
+          #   dpkg -l | grep intel || echo "Intel OpenMP package not found."
+          #   exit 1
+          # else
+          #   echo "✅ Found libiomp5.so at: $IOMP5_PATH"
+          # fi
 
-          # Extract directory path from found libiomp5.so
-          IOMP5_DIR=$(dirname "$IOMP5_PATH")
-          echo "Using IOMP5_DIR: $IOMP5_DIR"
+          # # Extract directory path from found libiomp5.so
+          # IOMP5_DIR=$(dirname "$IOMP5_PATH")
+          # echo "Using IOMP5_DIR: $IOMP5_DIR"
 
-          # Set LD_LIBRARY_PATH
-          export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
-          echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
+          # # Set LD_LIBRARY_PATH
+          # export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
+          # echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
 
-          # Debug: Check linker search paths
-          echo "🔍 Verifying linker search paths for libiomp5..."
-          ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
+          # # Debug: Check linker search paths
+          # echo "🔍 Verifying linker search paths for libiomp5..."
+          # ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
 
           # Handle Windows executable suffix
           [[ "$target" == *windows* ]] && exe=".exe"
 
+          # Build libzisk_witness.so
+          echo "🚀 Starting libzisk_witness.so build..."
+          cargo build --release -p zisk-witness --target "$target" "${flags[@]}"
+
           # RUSTFLAGS with correct path for building binaries
-          export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
+          export RUSTFLAGS="-C target-feature=+crt-static"
+          # export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
           echo "RUSTFLAGS set to: $RUSTFLAGS"
 
           # Build bins
           echo "🚀 Starting cargo bins build..."
           cargo build --release -p cargo-zisk -p ziskemu -p riscv -p zisk-core --target "$target" "${flags[@]}"
 
-          # RUSTFLAGS with correct path for building libzisk_witness.so
-          export RUSTFLAGS="-L${IOMP5_DIR} -liomp5"
-          echo "RUSTFLAGS set to: $RUSTFLAGS"
-
-          # Build libzisk_witness.so
-          echo "🚀 Starting libzisk_witness.so build..."
-          cargo build --release -p zisk-witness --target "$target" "${flags[@]}"
+          # # RUSTFLAGS with correct path for building libzisk_witness.so
+          # export RUSTFLAGS="-L${IOMP5_DIR} -liomp5"
+          # echo "RUSTFLAGS set to: $RUSTFLAGS"
 
           # Verify built binaries
           bins=(cargo-zisk ziskemu riscv2zisk)
