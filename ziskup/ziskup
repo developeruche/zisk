@@ -153,9 +153,7 @@ main() {
     fi
 
     # Compute the URL of the release tarball in the zisk repository.
-    echo $ZISKUP_TAG
     if [ "${ZISKUP_TAG}" = "latest" ]; then
-      echo "is latest"
       RELEASE_URL="https://github.com/${ZISKUP_REPO}/releases/latest/download/"
     else 
       RELEASE_URL="https://github.com/${ZISKUP_REPO}/releases/download/${ZISKUP_TAG}/"
@@ -171,7 +169,7 @@ main() {
       ensure unzip "$tmp" -d "$ZISK_BIN_DIR"
       rm -f "$tmp"
     else
-      tmp="$(mktemp -d)/cargo-zisk.tar-gz"
+      tmp="$(mktemp -d)/cargo_zisk.tar.gz"
       if check_cmd curl; then
         curl -H "Accept: application/octet-stream" -L -#o "$tmp" "$BIN_ARCHIVE_URL"
       else
