@@ -257,6 +257,7 @@ jobs:
         run: |
           if [ "$PLATFORM_NAME" == "linux" ]; then
             tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
+              --transform 's/.*\///' \
               ./target/${TARGET}/release/cargo-zisk \
               ./target/${TARGET}/release/ziskemu \
               ./target/${TARGET}/release/riscv2zisk \
@@ -269,6 +270,7 @@ jobs:
             # We need to use gtar here otherwise the archive is corrupt.
             # See: https://github.com/actions/virtual-environments/issues/2619
             gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
+              --transform 's/.*\///' \
               ./target/${TARGET}/release/cargo-zisk \
               ./target/${TARGET}/release/ziskemu \
               ./target/${TARGET}/release/riscv2zisk \
@@ -278,7 +280,7 @@ jobs:
 
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           else
-            7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" \
+            7z a -tzip -ep1 "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" \
               ./target/${TARGET}/cargo-zisk.exe ./target/${TARGET}/ziskemu.exe ./target/${TARGET}/riscv2zisk.exe \
               ./precompiles/keccakf/src/keccakf_script.json \
               ./ziskup/ziskup
