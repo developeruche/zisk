@@ -23,7 +23,6 @@ jobs:
     outputs:
       tag_name: ${{ steps.release_info.outputs.tag_name }}
       release_name: ${{ steps.release_info.outputs.release_name }}
-      changelog: ${{ steps.build_changelog.outputs.changelog }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,26 +61,16 @@ jobs:
             echo "release_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           fi
 
-      # Creates a `test-SHA` tag for this specific test release
-      - name: Create build-specific test tag
-        if: ${{ env.IS_TEST == 'true' }}
-        uses: actions/github-script@v7
-        env:
-          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
-        with:
-          script: |
-            const createTag = require('./.github/scripts/create-tag.js')
-            await createTag({ github, context }, process.env.TAG_NAME)
-
-      # - name: Build changelog
-      #   id: build_changelog
-      #   uses: mikepenz/release-changelog-builder-action@v4
-      #   with:
-      #     configuration: "./.github/changelog.json"
-      #     fromTag: ${{ env.IS_TEST == 'true' && 'test' || '' }}
-      #     toTag: ${{ steps.release_info.outputs.tag_name }}
+      # # Creates a `test-SHA` tag for this specific test release
+      # - name: Create build-specific test tag
+      #   if: ${{ env.IS_TEST == 'true' }}
+      #   uses: actions/github-script@v7
       #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+      #   with:
+      #     script: |
+      #       const createTag = require('./.github/scripts/create-tag.js')
+      #       await createTag({ github, context }, process.env.TAG_NAME)
 
   release:
     name: ${{ matrix.target }} (${{ matrix.runner }})
@@ -202,7 +191,7 @@ jobs:
           target="${{ matrix.target }}"
           flags=()
 
-          echo "🔍 Starting build process with enhanced debugging..."
+          echo "🔍 Starting build process..."
 
           # Debug: Show system info
           echo "🖥️  System Info:"
@@ -237,26 +226,21 @@ jobs:
           # Handle Windows executable suffix
           [[ "$target" == *windows* ]] && exe=".exe"
 
-          # RUSTFLAGS with correct path and debugging
+          # RUSTFLAGS with correct path for building binaries
           export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
           echo "RUSTFLAGS set to: $RUSTFLAGS"
 
-          # Debug: Check Rust and Cargo versions
-          echo "🔍 Rust and Cargo versions:"
-          rustc --version
-          cargo --version
-
-          # Build bins with debugging
+          # Build bins
           echo "🚀 Starting cargo bins build..."
           cargo build --release -p cargo-zisk -p ziskemu -p riscv -p zisk-core --target "$target" "${flags[@]}"
           # RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5" cargo build --release --all-features -p cargo-zisk -p ziskemu -p riscv -p zisk-core --target "$target" "${flags[@]}"
           # cargo build --release --target "$target" "${flags[@]}"
 
-          # RUSTFLAGS with correct path and debugging
+          # RUSTFLAGS with correct path for building libzisk_witness.so
           export RUSTFLAGS="-L${IOMP5_DIR} -liomp5"
           echo "RUSTFLAGS set to: $RUSTFLAGS"
 
-          # Build libzisk_witness.so with debugging
+          # Build libzisk_witness.so
           echo "🚀 Starting libzisk_witness.so build..."
           cargo build --release -p zisk-witness --target "$target" "${flags[@]}"
           # cargo build --release --target "$target" "${flags[@]}"
@@ -312,7 +296,7 @@ jobs:
 
       # Creates the release for this specific version
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -320,22 +304,8 @@ jobs:
           tag_name: ${{ needs.prepare.outputs.tag_name }}
           draft: ${{ env.IS_TEST == 'true' }}
           make_latest: "false"
-          # body: ${{ needs.prepare.outputs.changelog }}
           files: |
             ${{ steps.artifacts.outputs.file_name }}
-
-      # # If this is a nightly release, it also updates the release
-      # # tagged `nightly` for compatibility with `ziskup`
-      # - name: Update nightly release
-      #   if: ${{ env.IS_NIGHTLY == 'true' }}
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     name: "Nightly"
-      #     tag_name: "nightly"
-      #     prerelease: true
-      #     body: ${{ needs.prepare.outputs.changelog }}
-      #     files: |
-      #       ${{ steps.artifacts.outputs.file_name }}
 
   # cleanup:
   #   name: Release cleanup
