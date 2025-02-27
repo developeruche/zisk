@@ -282,17 +282,17 @@ jobs:
           if [ "$PLATFORM_NAME" == "linux" ]; then
           cargo_zisk_latest_linux_amd64.tar.gz
             tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so
-            echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
+            echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           elif [ "$PLATFORM_NAME" == "darwin" ]; then
             # We need to use gtar here otherwise the archive is corrupt.
             # See: https://github.com/actions/virtual-environments/issues/2619
             gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
-            echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
+            echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           else
             cd ./target/${TARGET}/release
             7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" cargo-zisk.exe ziskemu.exe riscv2zisk.exe
-            mv "cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" ../../../
-            echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" >> $GITHUB_OUTPUT
+            mv "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" ../../../
+            echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" >> $GITHUB_OUTPUT
           fi
 
       # Creates the release for this specific version
