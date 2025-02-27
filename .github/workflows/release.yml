@@ -115,17 +115,17 @@ jobs:
             libomp-dev libgmp-dev nasm libsodium-dev cmake openmpi-bin \
             openmpi-common libopenmpi-dev
 
-      - name: Install Intel OpenMP
-        shell: bash
-        run: |
-          # download the key to system keyring
-          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
-          | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+      # - name: Install Intel OpenMP
+      #   shell: bash
+      #   run: |
+      #     # download the key to system keyring
+      #     wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+      #     | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
 
-          # add signed entry to apt sources and configure the APT client to use Intel repository:
-          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update
-          sudo apt-get install -y intel-oneapi-openmp
+      #     # add signed entry to apt sources and configure the APT client to use Intel repository:
+      #     echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+      #     sudo apt-get update
+      #     sudo apt-get install -y intel-oneapi-openmp
 
       - name: Install rust toolchain
         id: rustc-toolchain
@@ -176,43 +176,40 @@ jobs:
           lsb_release -a || true
 
           # # Debug: Check if libiomp5.so is installed
-          # echo "🔍 Searching for libiomp5.so on the system..."
-          # IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
+          echo "🔍 Searching for libiomp5.so on the system..."
+          IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
 
-          # if [ -z "$IOMP5_PATH" ]; then
-          #   echo "❌ libiomp5.so not found on the system!"
-          #   echo "Attempting to list Intel OpenMP installation..."
-          #   dpkg -l | grep intel || echo "Intel OpenMP package not found."
-          #   exit 1
-          # else
-          #   echo "✅ Found libiomp5.so at: $IOMP5_PATH"
-          # fi
+          if [ -z "$IOMP5_PATH" ]; then
+            echo "❌ libiomp5.so not found on the system!"
+            echo "Attempting to list Intel OpenMP installation..."
+            dpkg -l | grep intel || echo "Intel OpenMP package not found."
+            exit 1
+          else
+            echo "✅ Found libiomp5.so at: $IOMP5_PATH"
+          fi
 
-          # # Extract directory path from found libiomp5.so
-          # IOMP5_DIR=$(dirname "$IOMP5_PATH")
-          # echo "Using IOMP5_DIR: $IOMP5_DIR"
+          # Extract directory path from found libiomp5.so
+          IOMP5_DIR=$(dirname "$IOMP5_PATH")
+          echo "Using IOMP5_DIR: $IOMP5_DIR"
 
-          # # Set LD_LIBRARY_PATH
-          # export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
-          # echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
+          # Set LD_LIBRARY_PATH
+          export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
+          echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
 
-          # # Debug: Check linker search paths
-          # echo "🔍 Verifying linker search paths for libiomp5..."
-          # ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
+          # Debug: Check linker search paths
+          echo "🔍 Verifying linker search paths for libiomp5..."
+          ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
 
           # Handle Windows executable suffix
           [[ "$target" == *windows* ]] && exe=".exe"
 
           # RUSTFLAGS with correct path for building binaries
-          #export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
-          export RUSTFLAGS="-C target-feature=+crt-static"
+          export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
           echo "RUSTFLAGS set to: $RUSTFLAGS"
 
           # Build bins
           echo "🚀 Starting cargo bins build..."
           cargo build --release -p cargo-zisk -p ziskemu -p riscv -p zisk-core --target "$target" "${flags[@]}"
-          # RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5" cargo build --release --all-features -p cargo-zisk -p ziskemu -p riscv -p zisk-core --target "$target" "${flags[@]}"
-          # cargo build --release --target "$target" "${flags[@]}"
 
           # RUSTFLAGS with correct path for building libzisk_witness.so
           export RUSTFLAGS="-L${IOMP5_DIR} -liomp5"
@@ -221,7 +218,6 @@ jobs:
           # Build libzisk_witness.so
           echo "🚀 Starting libzisk_witness.so build..."
           cargo build --release -p zisk-witness --target "$target" "${flags[@]}"
-          # cargo build --release --target "$target" "${flags[@]}"
 
           # Verify built binaries
           bins=(cargo-zisk ziskemu riscv2zisk)
@@ -259,16 +255,24 @@ jobs:
         shell: bash
         run: |
           if [ "$PLATFORM_NAME" == "linux" ]; then
-            tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so
+            tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
+              -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so \
+              -C ./precompiles/keccakf/src keccakf_script.json
+
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           elif [ "$PLATFORM_NAME" == "darwin" ]; then
             # We need to use gtar here otherwise the archive is corrupt.
             # See: https://github.com/actions/virtual-environments/issues/2619
-            gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
+            gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
+              -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
+              -C ./precompiles/keccakf/src keccakf_script.json
+
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           else
-            cd ./target/${TARGET}/release
-            7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" cargo-zisk.exe ziskemu.exe riscv2zisk.exe
+            7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" \
+              ./target/${TARGET}/cargo-zisk.exe ./target/${TARGET}/ziskemu.exe ./target/${TARGET}/riscv2zisk.exe
+              ./precompiles/keccakf/src/keccakf_script.json
+
             mv "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" ../../../
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" >> $GITHUB_OUTPUT
           fi
