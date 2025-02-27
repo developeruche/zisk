@@ -280,7 +280,6 @@ jobs:
         shell: bash
         run: |
           if [ "$PLATFORM_NAME" == "linux" ]; then
-          cargo_zisk_latest_linux_amd64.tar.gz
             tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           elif [ "$PLATFORM_NAME" == "darwin" ]; then
