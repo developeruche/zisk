@@ -10,6 +10,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  IS_TEST: 'true'  # o el valor correspondiente
 
 permissions:
   contents: write
@@ -115,17 +116,17 @@ jobs:
             libomp-dev libgmp-dev nasm libsodium-dev cmake openmpi-bin \
             openmpi-common libopenmpi-dev
 
-      # - name: Install Intel OpenMP
-      #   shell: bash
-      #   run: |
-      #     # download the key to system keyring
-      #     wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
-      #     | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+      - name: Install Intel OpenMP
+        shell: bash
+        run: |
+          # download the key to system keyring
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+          | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
 
-      #     # add signed entry to apt sources and configure the APT client to use Intel repository:
-      #     echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-      #     sudo apt-get update
-      #     sudo apt-get install -y intel-oneapi-openmp
+          # add signed entry to apt sources and configure the APT client to use Intel repository:
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+          sudo apt-get install -y intel-oneapi-openmp
 
       - name: Install rust toolchain
         id: rustc-toolchain
@@ -285,7 +286,7 @@ jobs:
         with:
           name: ${{ needs.prepare.outputs.release_name }}
           tag_name: ${{ needs.prepare.outputs.tag_name }}
-          draft: ${{ env.IS_TEST == 'true' && 'true' || 'false' }}
+          draft: ${{ env.IS_TEST == 'true' }}
           make_latest: "false"
           files: |
             ${{ steps.artifacts.outputs.file_name }}
