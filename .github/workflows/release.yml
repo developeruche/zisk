@@ -175,15 +175,6 @@ jobs:
           key: ${{ matrix.target }}
           cache-on-failure: true
 
-      - name: Install go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "^1.22.1"
-
-      - name: Check go installation
-        run: |
-          go version
-
       - name: Set up git private repo access
         run: |
           git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com/".insteadOf ssh://git@github.com
@@ -328,6 +319,7 @@ jobs:
           name: ${{ needs.prepare.outputs.release_name }}
           tag_name: ${{ needs.prepare.outputs.tag_name }}
           draft: ${{ env.IS_TEST == 'true' }}
+          make_latest: "false"
           # body: ${{ needs.prepare.outputs.changelog }}
           files: |
             ${{ steps.artifacts.outputs.file_name }}
