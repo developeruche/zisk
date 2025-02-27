@@ -176,7 +176,7 @@ jobs:
           uname -a
           lsb_release -a || true
 
-          # # Debug: Check if libiomp5.so is installed
+          # Debug: Check if libiomp5.so is installed
           echo "🔍 Searching for libiomp5.so on the system..."
           IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
 
@@ -257,22 +257,31 @@ jobs:
         run: |
           if [ "$PLATFORM_NAME" == "linux" ]; then
             tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
-              -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so \
-              -C ./precompiles/keccakf/src keccakf_script.json
+              ./target/${TARGET}/release/cargo-zisk \
+              ./target/${TARGET}/release/ziskemu \
+              ./target/${TARGET}/release/riscv2zisk \
+              ./target/${TARGET}/release/libzisk_witness.so \
+              ./precompiles/keccakf/src/keccakf_script.json \
+              ./ziskup/ziskup
 
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           elif [ "$PLATFORM_NAME" == "darwin" ]; then
             # We need to use gtar here otherwise the archive is corrupt.
             # See: https://github.com/actions/virtual-environments/issues/2619
             gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" \
-              -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
-              -C ./precompiles/keccakf/src keccakf_script.json
+              ./target/${TARGET}/release/cargo-zisk \
+              ./target/${TARGET}/release/ziskemu \
+              ./target/${TARGET}/release/riscv2zisk \
+              ./target/${TARGET}/release/libzisk_witness.so \
+              ./precompiles/keccakf/src/keccakf_script.json \
+              ./ziskup/ziskup
 
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           else
             7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" \
-              ./target/${TARGET}/cargo-zisk.exe ./target/${TARGET}/ziskemu.exe ./target/${TARGET}/riscv2zisk.exe
-              ./precompiles/keccakf/src/keccakf_script.json
+              ./target/${TARGET}/cargo-zisk.exe ./target/${TARGET}/ziskemu.exe ./target/${TARGET}/riscv2zisk.exe \
+              ./precompiles/keccakf/src/keccakf_script.json \
+              ./ziskup/ziskup
 
             mv "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" ../../../
             echo "file_name=cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" >> $GITHUB_OUTPUT
