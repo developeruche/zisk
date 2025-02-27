@@ -157,7 +157,7 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-          targets: ${{ matrix.target }}
+          target: ${{ matrix.target }}
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -280,16 +280,17 @@ jobs:
         shell: bash
         run: |
           if [ "$PLATFORM_NAME" == "linux" ]; then
-            tar -czvf "cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so
+          cargo_zisk_latest_linux_amd64.tar.gz
+            tar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk libzisk_witness.so
             echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           elif [ "$PLATFORM_NAME" == "darwin" ]; then
             # We need to use gtar here otherwise the archive is corrupt.
             # See: https://github.com/actions/virtual-environments/issues/2619
-            gtar -czvf "cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
+            gtar -czvf "cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release cargo-zisk ziskemu riscv2zisk
             echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" >> $GITHUB_OUTPUT
           else
             cd ./target/${TARGET}/release
-            7z a -tzip "cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" cargo-zisk.exe ziskemu.exe riscv2zisk.exe
+            7z a -tzip "cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip" cargo-zisk.exe ziskemu.exe riscv2zisk.exe
             mv "cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" ../../../
             echo "file_name=cargo_zisk_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" >> $GITHUB_OUTPUT
           fi
@@ -307,27 +308,3 @@ jobs:
           files: |
             ${{ steps.artifacts.outputs.file_name }}
 
-  # cleanup:
-  #   name: Release cleanup
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   needs: release
-  #   if: always()
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     # Moves the `nightly` tag to `HEAD`
-  #     - name: Move nightly tag
-  #       if: ${{ env.IS_NIGHTLY }}
-  #       uses: actions/github-script@v7
-  #       with:
-  #         script: |
-  #           const moveTag = require('./.github/scripts/move-tag.js')
-  #           await moveTag({ github, context }, 'nightly')
-
-  #     - name: Delete old nightlies
-  #       uses: actions/github-script@v7
-  #       with:
-  #         script: |
-  #           const prunePrereleases = require('./.github/scripts/prune-prereleases.js')
-  #           await prunePrereleases({github, context})
