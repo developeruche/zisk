@@ -60,7 +60,6 @@ jobs:
             echo "release_name=${GITHUB_REF_NAME}"
             echo "tag_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
             echo "release_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-          else  
           fi
 
       # Creates a `test-SHA` tag for this specific test release
