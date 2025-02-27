@@ -61,17 +61,6 @@ jobs:
             echo "release_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           fi
 
-      # # Creates a `test-SHA` tag for this specific test release
-      # - name: Create build-specific test tag
-      #   if: ${{ env.IS_TEST == 'true' }}
-      #   uses: actions/github-script@v7
-      #   env:
-      #     TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
-      #   with:
-      #     script: |
-      #       const createTag = require('./.github/scripts/create-tag.js')
-      #       await createTag({ github, context }, process.env.TAG_NAME)
-
   release:
     name: ${{ matrix.target }} (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
@@ -138,18 +127,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y intel-oneapi-openmp
 
-      # - name: Verify libiomp5 installation
-      #   run: |
-      #     find /usr -name "libiomp5*"
-      #     ls -l /usr/lib/x86_64-linux-gnu/libiomp5.*
-      #     echo $LD_LIBRARY_PATH
-
-      # - name: Set LD_LIBRARY_PATH
-      #   run: echo "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
-      - name: Set LD_LIBRARY_PATH for OpenMP
-        run: echo "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib/llvm-18/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
       - name: Install rust toolchain
         id: rustc-toolchain
         uses: actions-rs/toolchain@v1
@@ -198,36 +175,37 @@ jobs:
           uname -a
           lsb_release -a || true
 
-          # Debug: Check if libiomp5.so is installed
-          echo "🔍 Searching for libiomp5.so on the system..."
-          IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
+          # # Debug: Check if libiomp5.so is installed
+          # echo "🔍 Searching for libiomp5.so on the system..."
+          # IOMP5_PATH=$(find / -name "libiomp5.so" -type f 2>/dev/null | head -n 1 || true)
 
-          if [ -z "$IOMP5_PATH" ]; then
-            echo "❌ libiomp5.so not found on the system!"
-            echo "Attempting to list Intel OpenMP installation..."
-            dpkg -l | grep intel || echo "Intel OpenMP package not found."
-            exit 1
-          else
-            echo "✅ Found libiomp5.so at: $IOMP5_PATH"
-          fi
+          # if [ -z "$IOMP5_PATH" ]; then
+          #   echo "❌ libiomp5.so not found on the system!"
+          #   echo "Attempting to list Intel OpenMP installation..."
+          #   dpkg -l | grep intel || echo "Intel OpenMP package not found."
+          #   exit 1
+          # else
+          #   echo "✅ Found libiomp5.so at: $IOMP5_PATH"
+          # fi
 
-          # Extract directory path from found libiomp5.so
-          IOMP5_DIR=$(dirname "$IOMP5_PATH")
-          echo "Using IOMP5_DIR: $IOMP5_DIR"
+          # # Extract directory path from found libiomp5.so
+          # IOMP5_DIR=$(dirname "$IOMP5_PATH")
+          # echo "Using IOMP5_DIR: $IOMP5_DIR"
 
-          # Set LD_LIBRARY_PATH
-          export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
-          echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
+          # # Set LD_LIBRARY_PATH
+          # export LD_LIBRARY_PATH="$IOMP5_DIR:$LD_LIBRARY_PATH"
+          # echo "LD_LIBRARY_PATH set to: $LD_LIBRARY_PATH"
 
-          # Debug: Check linker search paths
-          echo "🔍 Verifying linker search paths for libiomp5..."
-          ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
+          # # Debug: Check linker search paths
+          # echo "🔍 Verifying linker search paths for libiomp5..."
+          # ldconfig -p | grep libiomp5 || echo "libiomp5 not found in ldconfig cache."
 
           # Handle Windows executable suffix
           [[ "$target" == *windows* ]] && exe=".exe"
 
           # RUSTFLAGS with correct path for building binaries
-          export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
+          #export RUSTFLAGS="-C target-feature=+crt-static -L${IOMP5_DIR} -liomp5"
+          export RUSTFLAGS="-C target-feature=+crt-static"
           echo "RUSTFLAGS set to: $RUSTFLAGS"
 
           # Build bins
@@ -257,6 +235,7 @@ jobs:
             fi
           done
 
+          # Verify built libraries
           libraries=(libzisk_witness.so)
           for name in "${libraries[@]}"; do
             bin=./target/$target/release/$name
@@ -302,7 +281,7 @@ jobs:
         with:
           name: ${{ needs.prepare.outputs.release_name }}
           tag_name: ${{ needs.prepare.outputs.tag_name }}
-          draft: ${{ env.IS_TEST == 'true' }}
+          draft: ${{ env.IS_TEST == 'true' && 'true' || 'false' }}
           make_latest: "false"
           files: |
             ${{ steps.artifacts.outputs.file_name }}
