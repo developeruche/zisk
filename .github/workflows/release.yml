@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare:
+  build:
     name: Build binaries
     runs-on: ubuntu-22.04
     timeout-minutes: 30
