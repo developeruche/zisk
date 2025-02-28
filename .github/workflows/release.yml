@@ -66,4 +66,39 @@ jobs:
                 fi
             done
 
-            echo "✅ Build process completed."            
+            echo "✅ Build process completed."
+
+      - name: Archive binaries
+        id: artifacts
+        env:
+          PLATFORM_NAME: ${{ matrix.platform }}
+          TARGET: ${{ matrix.target }}
+          ARCH: ${{ matrix.arch }}
+        shell: bash
+        run: |
+          if [ "$PLATFORM_NAME" == "linux" ] || [ "$PLATFORM_NAME" == "darwin" ]; then
+            ARCHIVE_FILE="cargo_zisk_${PLATFORM_NAME}_${ARCH}.tar.gz"
+
+            TAR_CMD="tar"
+            [ "$PLATFORM_NAME" == "darwin" ] && TAR_CMD="gtar"
+
+            $TAR_CMD -czvf "$ARCHIVE_FILE" --transform 's/.*\///' \
+              ./target/${TARGET}/release/cargo-zisk \
+              ./target/${TARGET}/release/ziskemu \
+              ./target/${TARGET}/release/riscv2zisk \
+              ./target/${TARGET}/release/libzisk_witness.so \
+              ./precompiles/keccakf/src/keccakf_script.json \
+              ./ziskup/ziskup
+          else
+            ARCHIVE_FILE="cargo_zisk_${PLATFORM_NAME}_${ARCH}.zip"
+            7z a -tzip -ep1 "$ARCHIVE_FILE" \
+              ./target/${TARGET}/release/cargo-zisk.exe \
+              ./target/${TARGET}/releaseziskemu.exe \
+              ./target/${TARGET}/release/riscv2zisk.exe \
+              ./precompiles/keccakf/src/keccakf_script.json \
+              ./ziskup/ziskup
+
+            mv "$ARCHIVE_FILE" ../../../
+          fi
+
+          echo "file_name=$ARCHIVE_FILE" >> $GITHUB_OUTPUT      
