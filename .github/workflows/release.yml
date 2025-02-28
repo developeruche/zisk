@@ -142,6 +142,11 @@ jobs:
 
           echo "file_name=$ARCHIVE_FILE" >> $GITHUB_OUTPUT
 
+      - name: Set up git private repo access
+        run: |
+          git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com/".insteadOf ssh://git@github.com
+          git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com".insteadOf https://github.com          
+        
       # Creates the release for this specific version
       - name: Create release
         uses: softprops/action-gh-release@v2
