@@ -18,11 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up git private repo access
-        shell: bash
-        run: |
-          git config --global url."https://${{ secrets.PULL_TOKEN }}@github.com/".insteadOf ssh://git@github.com
-          git config --global url."https://${{ secrets.PULL_TOKEN }}@github.com".insteadOf https://github.com
+      # - name: Set up git private repo access
+      #   shell: bash
+      #   run: |
+      #     git config --global url."https://${{ secrets.PULL_TOKEN }}@github.com/".insteadOf ssh://git@github.com
+      #     git config --global url."https://${{ secrets.PULL_TOKEN }}@github.com".insteadOf https://github.com
 
       - name: Set test flag
         run: |
@@ -82,10 +82,10 @@ jobs:
           override: true
           target: x86_64-unknown-linux-gnu
  
-      - name: Set up git private repo access
-        run: |
-          git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com/".insteadOf ssh://git@github.com
-          git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com".insteadOf https://github.com   
+      # - name: Set up git private repo access
+      #   run: |
+      #     git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com/".insteadOf ssh://git@github.com
+      #     git config --global url."https://${{ secrets.ZISK_CI_TOKEN }}@github.com".insteadOf https://github.com   
 
       - name: Install dependencies
         shell: bash
