@@ -4,9 +4,51 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+    name: Prepare release
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    outputs:
+      tag_name: ${{ steps.release_info.outputs.tag_name }}
+      release_name: ${{ steps.release_info.outputs.release_name }}
+    steps:
+      - name: Setup CI
+        uses: ./.github/actions/setup
+        with:
+          pull_token: ${{ secrets.PULL_TOKEN }}
+
+      - name: Set test flag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "IS_TEST=true" >> $GITHUB_ENV
+          else
+            echo "IS_TEST=false" >> $GITHUB_ENV
+          fi
+
+      # If it's a test release, tag with the release time. Else, use the tag name as is.
+      - name: Compute release name and tag
+        id: release_info
+        run: |
+          echo "IS_TEST=$IS_TEST"
+          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
+
+          if [[ $IS_TEST == "true" ]]; then
+            echo "IS_TEST"
+            echo "tag_name=test-${GITHUB_SHA}"
+            echo "release_name=Test ($(date '+%Y-%m-%d'))"
+            echo "tag_name=test-${GITHUB_SHA}" >> $GITHUB_OUTPUT
+            echo "release_name=Test ($(date '+%Y-%m-%d'))" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=${GITHUB_REF_NAME}"
+            echo "release_name=${GITHUB_REF_NAME}"
+            echo "tag_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "release_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
   release:
     name: ${{ matrix.target }} (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
+    needs: prepare
     timeout-minutes: 240
     strategy:
       fail-fast: false
@@ -101,4 +143,17 @@ jobs:
             mv "$ARCHIVE_FILE" ../../../
           fi
 
-          echo "file_name=$ARCHIVE_FILE" >> $GITHUB_OUTPUT      
+          echo "file_name=$ARCHIVE_FILE" >> $GITHUB_OUTPUT
+
+      # Creates the release for this specific version
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ needs.prepare.outputs.release_name }}
+          tag_name: ${{ needs.prepare.outputs.tag_name }}
+          draft: true
+          make_latest: "false"
+          files: |
+            ${{ steps.artifacts.outputs.file_name }}          
