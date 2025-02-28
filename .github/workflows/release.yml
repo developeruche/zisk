@@ -3,6 +3,10 @@ name: release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   prepare:
     name: Prepare release
