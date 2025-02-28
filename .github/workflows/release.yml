@@ -4,10 +4,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build binaries
-    runs-on: ubuntu-22.04
-    timeout-minutes: 30
+  release:
+    name: ${{ matrix.target }} (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # `runner`: GHA runner label
+          # `target`: Rust build target triple
+          # `platform` and `arch`: Used in tarball names
+          # `svm`: target platform to use for the Solc binary: https://github.com/roynalnaruto/svm-rs/blob/84cbe0ac705becabdc13168bae28a45ad2299749/svm-builds/build.rs#L4-L24
+          - runner: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            svm_target_platform: linux-amd64
+            platform: linux
+            arch: amd64
     steps:
       - uses: actions/checkout@v4
 
@@ -32,12 +45,14 @@ jobs:
         run: |
             echo "🔍 Starting build process..."
 
+            echo "target: ${{ matrix.target }}"
+
             # Show system info
             echo "🖥️  System Info:"
             uname -a
             lsb_release -a || true
 
-            cargo build --release
+            cargo build --release --target "${{ matrix.target }}"
             
             # Verify built binaries
             bins=(cargo-zisk ziskemu riscv2zisk libzisk_witness.so)
