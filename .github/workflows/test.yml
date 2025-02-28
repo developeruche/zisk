@@ -1,0 +1,54 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    name: Build binaries
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install rust toolchain
+        id: rustc-toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: default
+          override: true
+          target: x86_64-unknown-linux-gnu
+ 
+      - name: Install dependencies
+        shell: bash
+        run: |
+            sudo apt-get install -y xz-utils jq curl build-essential qemu-system libomp-dev \
+                libgmp-dev nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev \
+                libsecp256k1-dev libsodium-dev libpqxx-dev nasm
+
+      - name: Build binaries
+        shell: bash
+        run: |
+            echo "🔍 Starting build process..."
+
+            # Show system info
+            echo "🖥️  System Info:"
+            uname -a
+            lsb_release -a || true
+
+            cargo build --release
+            
+            # Verify built binaries
+            bins=(cargo-zisk ziskemu riscv2zisk libzisk_witness.so)
+            for name in "${bins[@]}"; do
+                bin=./target/$target/release/$name$exe
+                echo "🔍 Verifying binary: $bin"
+                file "$bin" || echo "⚠️  file command failed on $bin"
+                ldd "$bin" || echo "⚠️  ldd command failed on $bin"
+                if [[ "$name" = "cargo-zisk" ]]; then
+                $bin --version || echo "⚠️  Running $bin --version failed"
+                fi
+            done
+
+            echo "✅ Build process completed."            
