@@ -12,10 +12,7 @@ jobs:
       tag_name: ${{ steps.release_info.outputs.tag_name }}
       release_name: ${{ steps.release_info.outputs.release_name }}
     steps:
-      - name: Setup CI
-        uses: ./.github/actions/setup
-        with:
-          pull_token: ${{ secrets.PULL_TOKEN }}
+      - uses: actions/checkout@v4
 
       - name: Set test flag
         run: |
