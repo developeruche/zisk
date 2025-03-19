@@ -32,6 +32,8 @@ jobs:
                 libsecp256k1-dev libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common
 
       - name: Install and run ziskup
+        env:
+          GH_RUNNER: "1"      
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup

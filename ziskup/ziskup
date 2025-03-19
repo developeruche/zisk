@@ -183,14 +183,14 @@ main() {
       say "2) Install verify key"
       say "3) None"
 
-      # Check if there is a terminal available (interactive session)
-      if [[ -c /dev/tty && -r /dev/tty && -w /dev/tty ]]; then
+      # Check if we are running in a GitHub runner, in that case we use the default option
+      if [[ -n "$GH_RUNNER" ]]; then
+        say "Running from GitHub action, using default option 1"
+        user_choice=1
+      else
         # Read user input with default option set to 1
         read -p ">" user_choice < /dev/tty
         user_choice=${user_choice:-1}
-      else
-        say "No terminal available, using default option 1"
-        user_choice=1
       fi
 
       case $user_choice in
