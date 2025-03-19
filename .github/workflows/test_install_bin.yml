@@ -37,7 +37,6 @@ jobs:
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
-          ls $XDG_CONFIG_HOME/.zisk/bin
 
       - name: Add .zisk/bin to PATH
         shell: bash
@@ -46,7 +45,6 @@ jobs:
       - name: Create program
         shell: bash
         run: |
-          ls $XDG_CONFIG_HOME/.zisk/bin
           cargo-zisk sdk new sha_hasher
 
       - name: Build program
