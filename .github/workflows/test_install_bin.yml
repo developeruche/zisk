@@ -38,16 +38,16 @@ jobs:
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
           ls ~/.zisk/bin
-          ls $HOME/.zisk/bin
+          ls $XDG_CONFIG_HOME/.zisk/bin
 
-      - name: Add "$HOME/.zisk/bin" to PATH
+      - name: Add "$XDG_CONFIG_HOME/.zisk/bin" to PATH
         shell: bash
-        run: echo "PATH=$HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
+        run: echo "PATH=$XDG_CONFIG_HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
   
       - name: Create program
         shell: bash
         run: |
-          ls $HOME/.zisk/bin
+          ls $XDG_CONFIG_HOME/.zisk/bin
           cargo-zisk sdk new sha_hasher
           cd sha_hasher
 
