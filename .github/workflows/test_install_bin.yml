@@ -45,18 +45,18 @@ jobs:
       - name: Create program
         shell: bash
         run: |
-          cargo-zisk sdk new sha_hasher
+          cargo-zisk sdk new $HOME/sha_hasher
 
       - name: Build program
         shell: bash
+        working-directory: $HOME/sha_hasher
         run: |
-          cd sha_hasher
           cargo-zisk build --release
 
       - name: Run program
         shell: bash
+        working-directory: $HOME/sha_hasher
         run: |
-          cd sha_hasher
           cargo-zisk run --release | tee run_output.log
           if ! grep -qE "98211882|bd13089b|6ccf1fca|81f7f0e4|abf6352a|0c39c9b1|1f142cac|233f1280" run_output.log; then
             echo "❌ Run program failed"
@@ -65,8 +65,8 @@ jobs:
 
       - name: Prove program
         shell: bash
+        working-directory: $HOME/sha_hasher
         run: |
-          cd sha_hasher
           cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y | tee prove_output.log
           if ! grep -q "Vadcop Final proof was verified" prove_output.log; then
             echo "❌ Prove program failed"
@@ -75,8 +75,8 @@ jobs:
 
       - name: Verify proof
         shell: bash
+        working-directory: $HOME/sha_hasher
         run: |
-          cd sha_hasher
           cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json | tee verify_output.log
           if ! grep -q "Vadcop Final proof was verified" verify_output.log; then
             echo "❌ Verify proof failed"
