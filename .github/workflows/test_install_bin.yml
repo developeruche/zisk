@@ -36,11 +36,15 @@ jobs:
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
 
+      - name: Add "$HOME/.zisk/bin" to profile file
+        shell: bash
+        run: |
+          echo >>$HOME/.bashrc && echo "export PATH=\"\$PATH:$HOME/.zisk/bin\"" >> $HOME/.bashrc
+          source $HOME/.bashrc
+  
       - name: Create program
         shell: bash
         run: |
-          ls ~/.zisk
-          source $HOME/.bashrc
           cargo-zisk sdk new sha_hasher
           cd sha_hasher
 
