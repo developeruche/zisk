@@ -36,7 +36,7 @@ jobs:
 
       - name: Install and run ziskup
         run: |
-          curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup
+          curl -O https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup
           chmod +x ./ziskup
           expect <<EOF
           spawn bash ./ziskup
