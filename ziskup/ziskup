@@ -183,9 +183,14 @@ main() {
       say "2) Install verify key"
       say "3) None"
 
-      # Read user input with default option set to 1
-      read -p ">" user_choice < /dev/tty
-      user_choice=${user_choice:-1}
+      if [[ -c /dev/tty ]]; then
+        # Read user input with default option set to 1
+        read -p ">" user_choice < /dev/tty
+        user_choice=${user_choice:-1}
+      else
+        say "No terminal available, using default option 1"
+        user_choice=1
+      fi
 
       case $user_choice in
           1)

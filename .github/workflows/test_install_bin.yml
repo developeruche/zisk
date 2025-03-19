@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
-      # - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install rust toolchain
         id: rustc-toolchain
@@ -36,14 +36,8 @@ jobs:
 
       - name: Install and run ziskup
         run: |
-          curl -O https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup
-          chmod +x ./ziskup
-          unbuffer expect <<EOF
-          spawn ./ziskup
-          expect ">"
-          send "1\r"
-          expect eof
-          EOF
+          chmod +x ./ziskup/ziskup
+          ./ziskup/ziskup
 
       - name: Create program
         shell: bash
