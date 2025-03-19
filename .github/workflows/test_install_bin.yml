@@ -37,6 +37,7 @@ jobs:
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
+          ls $XDG_CONFIG_HOME
 
       - name: Add .zisk/bin to PATH
         shell: bash
