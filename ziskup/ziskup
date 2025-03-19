@@ -233,6 +233,7 @@ main() {
       bin_path="$ZISK_BIN_DIR/$bin"
 
       # Print installed msg
+      say "$bin_path"
       say "Installed - $(ensure "$bin_path" sdk --version)"
 
       # Check if the default path of the binary is not in ZISK_BIN_DIR

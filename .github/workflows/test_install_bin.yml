@@ -33,7 +33,7 @@ jobs:
 
       - name: Install and run ziskup
         env:
-          GH_RUNNER: "1"      
+          GH_RUNNER: "1" # Inform ziskup that we are running on GitHub Actions     
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
