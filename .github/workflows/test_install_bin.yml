@@ -36,11 +36,9 @@ jobs:
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
 
-      - name: Add "$HOME/.zisk/bin" to profile file
+      - name: Add "$HOME/.zisk/bin" to PATH
         shell: bash
-        run: |
-          echo >>$HOME/.bashrc && echo "export PATH=\"\$PATH:$HOME/.zisk/bin\"" >> $HOME/.bashrc
-          source $HOME/.bashrc
+        run: echo "PATH=$HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
   
       - name: Create program
         shell: bash
