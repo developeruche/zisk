@@ -31,9 +31,6 @@ jobs:
                 libgmp-dev nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev \
                 libsecp256k1-dev libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common
 
-      - name: Install expect
-        run: sudo apt-get install -y expect
-
       - name: Install and run ziskup
         run: |
           chmod +x ./ziskup/ziskup
@@ -43,6 +40,7 @@ jobs:
         shell: bash
         run: |
           ls ~/.zisk
+          source $HOME/.bashrc
           cargo-zisk sdk new sha_hasher
           cd sha_hasher
 
