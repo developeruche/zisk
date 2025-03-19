@@ -43,6 +43,7 @@ jobs:
       - name: Create program
         shell: bash
         run: |
+          ls $HOME/.zisk/bin
           cargo-zisk sdk new sha_hasher
           cd sha_hasher
 
