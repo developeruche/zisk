@@ -46,6 +46,8 @@ jobs:
         shell: bash
         run: |
           cargo-zisk sdk new $HOME/sha_hasher
+          # Change the number of hashes to 1 to reduce size of the proof
+          sed -i 's/let n: u64 = 20;/let n: u64 = 1;/' $HOME/sha_hasher/build.rs
 
       - name: Build program
         shell: bash
