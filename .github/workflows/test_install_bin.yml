@@ -37,11 +37,10 @@ jobs:
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
-          ls -a $XDG_CONFIG_HOME
 
       - name: Add .zisk/bin to PATH
         shell: bash
-        run: echo "PATH=$XDG_CONFIG_HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
+        run: echo "PATH=$HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
   
       - name: Create program
         shell: bash
