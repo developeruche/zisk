@@ -36,13 +36,12 @@ jobs:
         run: |
           curl -O https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup
           chmod +x ./ziskup
-          script -q -c "expect <<EOF
+          expect <<EOF
           spawn ./ziskup
-          expect \">\"
-          send \"1\r\"
-          expect eof
+          expect ">"
+          send "1\r"
+          interact
           EOF
-          "
 
       - name: Create program
         shell: bash
