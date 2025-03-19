@@ -31,10 +31,17 @@ jobs:
                 libgmp-dev nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev \
                 libsecp256k1-dev libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common
 
+      - name: Install expect
+        run: sudo apt-get install -y expect
+
       - name: Install and run ziskup
-        shell: bash
         run: |
-          curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/install.sh | bash
+          expect <<EOF
+          spawn script -q -c "curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/install.sh | bash" /dev/null
+          expect ">"
+          send "1\r"
+          expect eof
+          EOF
 
   program:
     name: Create and verify example program
