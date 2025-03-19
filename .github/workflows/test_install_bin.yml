@@ -1,4 +1,4 @@
-name: Test ZisK Installation (Binaries)
+name: Test ZisK Installation (binaries)
 
 on:
   workflow_dispatch:
@@ -35,6 +35,8 @@ jobs:
         run: |
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
+          ls ~/.zisk/bin
+          ls $HOME/.zisk/bin
 
       - name: Add "$HOME/.zisk/bin" to PATH
         shell: bash
