@@ -36,8 +36,9 @@ jobs:
 
       - name: Install and run ziskup
         run: |
+          curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup
           expect <<EOF
-          spawn script -q -c "curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/install.sh | bash" /dev/null
+          spawn ./ziskup
           expect ">"
           send "1\r"
           expect eof
