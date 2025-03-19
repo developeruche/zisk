@@ -10,7 +10,7 @@ permissions:
 jobs:
   install:
     name: Install ZisK from binaries
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04-4cores
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
