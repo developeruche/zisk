@@ -183,7 +183,7 @@ main() {
       say "2) Install verify key"
       say "3) None"
 
-      if [[ -c /dev/tty ]]; then
+      if [[ -c /dev/tty && -r /dev/tty && -w /dev/tty && $(exec </dev/tty) ]]; then
         # Read user input with default option set to 1
         read -p ">" user_choice < /dev/tty
         user_choice=${user_choice:-1}
