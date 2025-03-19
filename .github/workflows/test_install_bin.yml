@@ -47,7 +47,7 @@ jobs:
         run: |
           cargo-zisk sdk new $HOME/sha_hasher
           # Change the number of hashes to 1 to reduce size of the proof
-          # sed -i 's/let n: u64 = 20;/let n: u64 = 1;/' $HOME/sha_hasher/build.rs
+          sed -i 's/let n: u64 = 20;/let n: u64 = 1;/' $HOME/sha_hasher/build.rs
 
       - name: Build program
         shell: bash
@@ -60,7 +60,7 @@ jobs:
         run: |
           cd $HOME/sha_hasher
           cargo-zisk run --release | tee run_output.log
-          if ! grep -qE "98211882|bd13089b|6ccf1fca|81f7f0e4|abf6352a|0c39c9b1|1f142cac|233f1280" run_output.log; then
+          if ! grep -qE "66687aad|f862bd77|6c8fc18b|8e9f8e20|08971485|6ee233b3|902a591d|0d5f2925" run_output.log; then
             echo "❌ Run program failed"
             exit 1
           fi
