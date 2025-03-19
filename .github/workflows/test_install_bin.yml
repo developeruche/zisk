@@ -40,7 +40,8 @@ jobs:
           spawn ./ziskup
           expect ">"
           send "1\r"
-          interact
+          sleep 300
+          expect eof
           EOF
 
       - name: Create program
