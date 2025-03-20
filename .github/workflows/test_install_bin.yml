@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Clean home directory
         run: |
-          rm -rf $HOME/{*,.*} || true
+          find $HOME -mindepth 1 -delete || true
           ls -la $HOME
 
       - name: Check resources
