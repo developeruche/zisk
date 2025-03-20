@@ -96,12 +96,5 @@ jobs:
             exit 1
           fi          
 
-      - name: Cleanup Docker
-        if: always()
-        run: |
-          echo "Cleaning up Docker environment..."
-          docker container prune -f
-          docker volume prune -f
-          docker rmi -f $(docker images -q) || true
 
 
