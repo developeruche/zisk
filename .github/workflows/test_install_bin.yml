@@ -13,7 +13,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: ubuntu:22.04
-      options: --memory=32g --cpus=8
+      options: --memory=64g --cpus=16
     timeout-minutes: 30
     steps:
       - name: Clean home directory
