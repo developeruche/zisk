@@ -13,7 +13,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: ubuntu:22.04
-      options: --memory=24g --cpus=8  
+      options: --memory=32g --cpus=8  
     timeout-minutes: 30
     steps:
       - name: Check resources
@@ -51,7 +51,9 @@ jobs:
 
       - name: Add .zisk/bin to PATH
         shell: bash
-        run: echo "PATH=$HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
+        run: |
+          echo >>$HOME/.bashrc && echo "export PATH=\"\$PATH:$HOME/.zisk/bin\"" >> $HOME/.bashrc
+          source $HOME/.bashrc
   
       - name: Create program
         shell: bash
