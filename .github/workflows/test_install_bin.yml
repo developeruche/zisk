@@ -54,6 +54,7 @@ jobs:
         run: |
           echo >>$HOME/.bashrc && echo "export PATH=\"\$PATH:$HOME/.zisk/bin\"" >> $HOME/.bashrc
           source $HOME/.bashrc
+          ls -la $HOME/.zisk/bin
   
       - name: Create program
         shell: bash
