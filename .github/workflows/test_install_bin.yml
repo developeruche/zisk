@@ -8,12 +8,22 @@ permissions:
   pull-requests: read    
 
 jobs:
+  cleanup:
+    name: Cleanup Docker Environment
+    runs-on: self-hosted
+    steps:
+      - name: Clean up Docker containers and volumes
+        run: |
+          docker container prune -f
+          docker volume prune -f
+          docker rmi -f $(docker images -q) || true
+            
   install:
     name: Install ZisK from binaries
     runs-on: self-hosted
     container:
       image: ubuntu:22.04
-      options: --memory=32g --cpus=8 --pull always
+      options: --memory=32g --cpus=8
     timeout-minutes: 30
     steps:
       - name: Check resources
