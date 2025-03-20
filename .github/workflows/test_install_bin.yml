@@ -17,10 +17,11 @@ jobs:
           docker container prune -f
           docker volume prune -f
           docker rmi -f $(docker images -q) || true
-            
+
   install:
     name: Install ZisK from binaries
     runs-on: self-hosted
+    needs: cleanup
     container:
       image: ubuntu:22.04
       options: --memory=32g --cpus=8
