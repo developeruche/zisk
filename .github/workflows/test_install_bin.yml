@@ -23,7 +23,7 @@ jobs:
           ls -la $HOME
 
       - name: Install dependencies
-        run: apt-get update && apt-get install -y curl git-all
+        run: apt-get update && apt-get install -y curl && apt-get install -y git
 
       - uses: actions/checkout@v4
 
