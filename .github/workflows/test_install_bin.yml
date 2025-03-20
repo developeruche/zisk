@@ -13,8 +13,8 @@ jobs:
     runs-on: self-hosted
     container:
       image: ubuntu:22.04
-      options: --memory=64g --cpus=16
-    timeout-minutes: 30
+      options: --memory=56g --cpus=16
+    timeout-minutes: 60
     steps:
       - name: Clean home directory
         run: |
@@ -26,12 +26,12 @@ jobs:
           echo "CPUs: $(nproc)"
           free -h
 
-      - name: Install dependencies
+      - name: Install tools
         run: apt-get update && apt-get install -y curl && apt-get install -y git
 
       - uses: actions/checkout@v4
 
-      - name: Install rust toolchain
+      - name: Install Rust toolchain
         id: rustc-toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -40,7 +40,7 @@ jobs:
           override: true
           target: x86_64-unknown-linux-gnu
 
-      - name: Install dependencies
+      - name: Install ZisK dependencies
         shell: bash
         run: |
             apt-get install -y xz-utils jq curl build-essential qemu-system libomp-dev \
@@ -54,7 +54,7 @@ jobs:
           chmod +x ./ziskup/ziskup
           ./ziskup/ziskup
 
-      - name: Add Zisk bin directory to PATH
+      - name: Add ZisK bin directory to PATH
         run: echo "$HOME/.zisk/bin" >> $GITHUB_PATH
 
       - name: Create program
