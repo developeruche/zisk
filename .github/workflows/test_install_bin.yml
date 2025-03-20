@@ -20,9 +20,10 @@ jobs:
         run: |
           echo "CPUs: $(nproc)"
           free -h
+          ls -la $HOME
 
       - name: Install dependencies
-        run: apt-get update && apt-get install -y curl
+        run: apt-get update && apt-get install -y curl git-all
 
       - uses: actions/checkout@v4
 
