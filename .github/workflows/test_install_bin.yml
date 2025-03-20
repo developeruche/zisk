@@ -51,15 +51,12 @@ jobs:
 
       - name: Add .zisk/bin to PATH
         shell: bash
-        run: |
-          echo >>$HOME/.bashrc && echo "export PATH=\"\$PATH:$HOME/.zisk/bin\"" >> $HOME/.bashrc
-          source $HOME/.bashrc
-          ls -la $HOME/.zisk/bin
+        run: echo "PATH=$HOME/.zisk/bin:$PATH" >> $GITHUB_ENV
   
       - name: Create program
         shell: bash
         run: |
-          cargo-zisk sdk new $HOME/sha_hasher
+          $HOME/.zisk/bin/cargo-zisk sdk new $HOME/sha_hasher
           # Change the number of hashes to 1 to reduce size of the proof
           sed -i 's/let n: u64 = 20;/let n: u64 = 1;/' $HOME/sha_hasher/build.rs
 
@@ -67,13 +64,13 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk build --release
+          $HOME/.zisk/bin/cargo-zisk build --release
 
       - name: Run program
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk run --release | tee run_output.log
+          $HOME/.zisk/bin/cargo-zisk run --release | tee run_output.log
           if ! grep -qE "66687aad|f862bd77|6c8fc18b|8e9f8e20|08971485|6ee233b3|902a591d|0d5f2925" run_output.log; then
             echo "❌ Run program failed"
             exit 1
@@ -83,7 +80,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y | tee prove_output.log
+          $HOME/.zisk/bin/cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y | tee prove_output.log
           if ! grep -q "Vadcop Final proof was verified" prove_output.log; then
             echo "❌ Prove program failed"
             exit 1
@@ -93,7 +90,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json | tee verify_output.log
+          $HOME/.zisk/bin/cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json | tee verify_output.log
           if ! grep -q "Vadcop Final proof was verified" verify_output.log; then
             echo "❌ Verify proof failed"
             exit 1
