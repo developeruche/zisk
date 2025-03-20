@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Check resources
         run: |
-          ls -la /github/home
+          ls -la /home/edu/actions-runner/_work/_temp/_github_home
 
   install:
     name: Install ZisK from binaries
