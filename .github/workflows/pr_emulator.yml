@@ -23,6 +23,14 @@ jobs:
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
     steps:
+      - name: Fix permissions on workspace
+        run: sudo chown -R $(whoami):$(whoami) ${{ github.workspace }}
+    
+      - name: Clean previous workspace manually
+        run: |
+          echo "Cleaning ${GITHUB_WORKSPACE}..."
+          sudo rm -rf ${{ github.workspace }}/zisk
+      
       - name: Checkout sources
         uses: actions/checkout@v4
 
