@@ -29,8 +29,6 @@ jobs:
       - name: Install tools
         run: apt-get update && apt-get install -y curl && apt-get install -y git
 
-      - uses: actions/checkout@v4
-
       - name: Install Rust toolchain
         id: rustc-toolchain
         uses: actions-rs/toolchain@v1
@@ -51,8 +49,7 @@ jobs:
         env:
           GH_RUNNER: "1" # Inform ziskup that we are running on GitHub Actions     
         run: |
-          chmod +x ./ziskup/ziskup
-          ./ziskup/ziskup
+          curl https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/install.sh | bash
 
       - name: Add ZisK bin directory to PATH
         run: echo "$HOME/.zisk/bin" >> $GITHUB_PATH
