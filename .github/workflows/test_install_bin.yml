@@ -20,6 +20,7 @@ jobs:
         run: |
           find $HOME -mindepth 1 -delete || true
           ls -la $HOME
+          rm -rf refs/heads/feature/gha-test-install-bin
 
       - name: Check resources
         run: |
