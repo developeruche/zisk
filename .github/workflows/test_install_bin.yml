@@ -84,6 +84,9 @@ jobs:
         run: |
           cd $HOME/sha_hasher
           cargo-zisk rom-setup -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher | tee romsetup_output.log
+          echo "🔍 Mostrando contenido con caracteres invisibles:"
+          cat -A romsetup_output.log
+
           if ! grep -F "ROM setup successfully completed" romsetup_output.log; then
             echo "❌ Program setup failed"
             exit 1
