@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk run --release | tee run_output.log
+          cargo-zisk run --release -i build/input.bin | tee run_output.log
           if ! grep -qE "66687aad|f862bd77|6c8fc18b|8e9f8e20|08971485|6ee233b3|902a591d|0d5f2925" run_output.log; then
             echo "❌ Run program failed"
             exit 1
