@@ -83,7 +83,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk rom-setup -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher | tee romsetup_output.log
+          cargo-zisk rom-setup -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher 2>&1 | tee romsetup_output.log
           echo "🔍 Mostrando contenido con caracteres invisibles:"
           cat -A romsetup_output.log
 
