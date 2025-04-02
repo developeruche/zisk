@@ -96,7 +96,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y | tee prove_output.log
+          cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y 2>&1 | tee prove_output.log
           if ! grep -F "Vadcop Final proof was verified" prove_output.log; then
             echo "❌ Prove program failed"
             exit 1
@@ -106,7 +106,7 @@ jobs:
         shell: bash
         run: |
           cd $HOME/sha_hasher
-          cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json | tee verify_output.log
+          cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json 2>&1 | tee verify_output.log
           if ! grep -F "Vadcop Final proof was verified" verify_output.log; then
             echo "❌ Verify proof failed"
             exit 1
