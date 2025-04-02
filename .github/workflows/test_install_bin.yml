@@ -60,8 +60,6 @@ jobs:
         shell: bash
         run: |
           cargo-zisk sdk new $HOME/sha_hasher
-          # Change the number of hashes to 1 to reduce size of the proof
-          # sed -i 's/let n: u64 = 20;/let n: u64 = 1;/' $HOME/sha_hasher/build.rs
 
       - name: Build program
         shell: bash
@@ -104,7 +102,7 @@ jobs:
         run: |
           cd $HOME/sha_hasher
           cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json 2>&1 | tee verify_output.log
-          if ! grep -F "Vadcop Final proof was verified" verify_output.log; then
+          if ! grep -F "Stark proof was verified" verify_output.log; then
             echo "❌ Verify proof failed"
             exit 1
           fi          
