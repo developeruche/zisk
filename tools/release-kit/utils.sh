@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Colors
+BOLD=$(tput bold)
+GREEN=$(tput setaf 2)
+RED=$(tput setaf 1)
+RESET=$(tput sgr0)
+
+# Helper to run and log
+ensure() {
+    if ! "$@"; then
+        echo "${RED}❌ Error: command failed -> $*${RESET}" >&2
+        exit 1
+    fi
+}
+
+step() {
+    echo "${BOLD}${GREEN}[${current_step}/${total_steps}] $1${RESET}"
+
+    current_step=$(( ${current_step} + 1 ))
+}
+
+info() {
+    echo $1
+}
+
+warn() {
+    echo "${BOLD}${GREEN}⚠️  $1${RESET}"
+}
+
+err() {
+    echo "${RED}❌ Error: $1${RESET}" >&2
+    exit 1
+}
+
+success() {
+    echo "${BOLD}${GREEN}✅ $1${RESET}"
+}
+
+load_env() {
+    if [[ ! -f ".env" ]]; then
+        err "❌ No .env file found. Please create one with the required environment variables."
+        exit 1
+    fi
+
+    # Load environment variables from .env file ignoring comments and empty lines
+    ENV_VARS=$(grep -vE '^\s*#' .env | grep -vE '^\s*$')
+
+    if [[ -z "${ENV_VARS}" ]]; then
+        err "❌ .env file is empty or contains only comments. Please define the required environment variables."
+        exit 1
+    fi
+
+    info "📦 Loading environment variables from .env"
+    export ${ENV_VARS}
+
+    echo
+    info "🔍 Loaded environment variables:"
+    while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^# ]] && continue
+        echo "  - ${key} = ${!key}"
+    done < <(echo "${ENV_VARS}")
+    echo
+}
