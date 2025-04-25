@@ -16,8 +16,12 @@ If the container already exists, you will be asked whether you want to connect t
 >
 >If you choose to recreate the container, all existing content inside it will be lost.
 
-The Docker container includes a `${HOME}/output` directory, which is mapped to the `./output` folder on the host.  
-You can use this folder to copy any files you want to make available outside of the container.
+> [!TIP]
+>
+>The Docker container includes a `${HOME}/output` directory, which is mapped to the `./output` folder on the host.  
+>You can use this folder to copy any files you want to make available outside of the container.
+
+## Menu Options
 
 1. **Edit environment variables**  
    Opens the `.env` file with the `nano` editor, allowing you to modify environment variable values.  
