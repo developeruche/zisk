@@ -12,6 +12,9 @@ RUN groupadd --gid 1000 ziskuser && \
 RUN apt update && apt install -y sudo && \
     echo "ziskuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Prepare /output directory with correct permissions
+RUN mkdir -p /output && chown ziskuser:ziskuser /output
+
 # Copy all project files to the new user's home directory
 COPY ./ /home/ziskuser/zisk-release-kit/
 

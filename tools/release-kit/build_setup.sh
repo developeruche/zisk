@@ -7,8 +7,7 @@ total_steps=9
 
 step "Loading environment variables..."
 load_env
-info "Press any key to continue..."
-read -n 1 -s
+confirm_continue
 
 step  "Cloning pil2-compiler, pil2-proofman and pil2-proofman-js repos..."
 

@@ -8,12 +8,15 @@ PROJECT_NAME="sha_hasher"
 EXPECTED_OUTPUT="98211882|bd13089b|6ccf1fca|81f7f0e4|abf6352a|0c39c9b1|1f142cac|233f1280"
 
 current_step=1
-total_steps=8
+total_steps=9
 
 step "Deleting shared memory..."
 rm -rf /dev/shm/SHM*
 
 step "Creating new ZisK program: $PROJECT_NAME"
+# Remove existing directory if it exists
+rm -rf "$PROJECT_NAME"
+# Create ZisK program
 ensure cargo-zisk sdk new "$PROJECT_NAME"
 cd "$PROJECT_NAME"
 
@@ -43,7 +46,14 @@ if ! grep -F "ROM setup successfully completed" romsetup_output.log; then
     err "program setup failed"
     exit 1
 fi
-  
+
+step "Verifying constraints..."
+ensure cargo-zisk verify-constraints -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin 2>&1 | tee constraints_output.log
+if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
+    err "verify constraints failed"
+    exit 1
+fi
+
 step "Generating proof..."  
 ensure cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y 2>&1 | tee prove_output.log
 if ! grep -F "Vadcop Final proof was verified" prove_output.log; then

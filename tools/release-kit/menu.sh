@@ -15,6 +15,7 @@ while true; do
   echo "6) Test pessimistic proof"
   echo "7) Test Ethereum block"
   echo "8) Release Setup"
+  echo "9) Shell"
   echo "0) Exit"
   echo
 
@@ -57,9 +58,13 @@ while true; do
       info "Running release_setup.sh with version '$release_version'..."
       ./release_setup.sh "$release_version"
       ;;
+    9)
+      info "Open shell"
+      bash
+      ;;   
     0)
       info "Exiting ZisK Release Kit. Goodbye!"
-      break
+      exit
       ;;
     *)
       info "Invalid selection. Please enter a number between 0 and 5."

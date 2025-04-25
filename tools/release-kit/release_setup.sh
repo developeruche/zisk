@@ -2,16 +2,14 @@
 
 source ./utils.sh
 
+$OUTPUT_DIR="./output"
+
 current_step=1
-total_steps=3
+total_steps=5
 
-# Check if version argument is provided
-if [[ -z "$1" ]]; then
-  err "version not defined. Please provide a version number."
-  exit 1
-fi
-
-SETUP_VERSION=$1
+step "Loading environment variables..."
+load_env
+confirm_continue
 
 step "Compress proving key..."
 cd zisk/build
@@ -28,3 +26,10 @@ ensure md5sum "zisk-provingkey-${SETUP_VERSION}.tar.gz" > "zisk-provingkey-${SET
 ensure md5sum "zisk-verifykey-${SETUP_VERSION}.tar.gz" > "zisk-verifykey-${SETUP_VERSION}.tar.gz.md5"
 
 cd ../..
+
+step "Move files to output folder..."
+ensure sudo mv "./zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}"
+ensure sudo mv "./zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}"
+ensure sudo mv "./zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}"
+ensure sudo mv "./zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}"
+

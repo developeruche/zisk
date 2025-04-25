@@ -3,7 +3,7 @@ set -e
 
 source ./utils.sh
 
-IMAGE_NAME="zisk-container"
+IMAGE_NAME="zisk-image"
 CONTAINER_NAME="zisk-docker"
 OUTPUT_DIR="./output"
 
@@ -24,9 +24,11 @@ info "📜 Container '${CONTAINER_NAME}' is now running."
 info "📦 Installing ZisK dependencies..."
 docker exec -it "${CONTAINER_NAME}" bash -i -c "./install_deps.sh"
 
-echo
-info "🛑 ${BOLD}To stop the container, run:${RESET} docker stop ${CONTAINER_NAME}"
-info "❌ ${BOLD}To remove the container, run:${RESET} docker rm -f ${CONTAINER_NAME}"
 echo 
 info "🔑 Accessing the container now..."
-docker exec -it ${CONTAINER_NAME} bash -i -c "./menu.sh; exec bash"
+docker exec -it ${CONTAINER_NAME} bash -i -c "sudo chmod 777 /output; ./menu.sh"
+
+echo
+info "${BOLD}To access the container, run:${RESET}\n   docker exec -it ${CONTAINER_NAME}  bash -i -c "./menu.sh""
+info "${BOLD}To stop the container, run:${RESET}\n   docker stop ${CONTAINER_NAME}"
+info "${BOLD}To remove the container, run:${RESET}\n   docker rm -f ${CONTAINER_NAME}"

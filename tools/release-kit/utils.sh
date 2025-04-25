@@ -62,3 +62,13 @@ load_env() {
     done < <(echo "${ENV_VARS}")
     echo
 }
+
+confirm_continue() {
+    read -p "Do you want to continue? [Y/n] " answer
+    answer=${answer:-y}
+
+    if [[ "$answer" != [Yy]* ]]; then
+        echo "Aborted."
+        exit 1
+    fi
+}
