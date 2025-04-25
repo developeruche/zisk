@@ -7,20 +7,21 @@ while true; do
   echo "==============================="
   echo "     ZisK Release Kit Menu     "
   echo "==============================="
-  echo "1) Edit environment variables"
-  echo "2) Build Zisk from source"
-  echo "3) Build Setup from source"
-  echo "4) Install Setup from binaries"
-  echo "5) Test sha_hasher"
-  echo "6) Test pessimistic proof"
-  echo "7) Test Ethereum block"
-  echo "8) Release Setup"
-  echo "9) Shell"
-  echo "0) Exit"
+  echo " 1) Edit environment variables"
+  echo " 2) Build Zisk from source"
+  echo " 3) Build setup from source"
+  echo " 4) Build setup artifacts"
+  echo " 5) Test sha_hasher"
+  echo " 6) Test pessimistic proof"
+  echo " 7) Test Ethereum block"
+  echo " 8) Install setup from public artifacts"
+  echo " 9) Install setup from local artifacts"
+  echo "10) Shell"
+  echo "11) Exit"
   echo
 
   # Prompt for input
-  read -p "Select an option [0-5]: " option
+  read -p "Select an option [1-11]: " option
   echo
 
   case $option in
@@ -30,39 +31,42 @@ while true; do
       ;;
     2)
       info "Running build_zisk.sh..."
-      source ./build_zisk.sh
+      source ./build_zisk.sh || :
       ;;
     3)
       info "Running build_setup.sh..."
-      source ./build_setup.sh
+      source ./build_setup.sh || :
       ;;
     4)
-      info "Running download_setup.sh..."
-      source ./download_setup.sh
+      info "Running release_setup.sh..."
+      ./release_setup.sh || :
       ;;
     5)
       info "Running test_sha_hasher.sh..."
-      source ./test_sha_hasher.sh
+      source ./test_sha_hasher.sh || :
       ;;
     6)
       info "Running test_pp.sh"
-      source ./test_pp.sh
+      source ./test_pp.sh || :
       ;;  
     7)
-      inf "Running test_eth_block.sh"
-      source ./test_eth_block.sh
+      warn "Not yet implemented"
+      read -p "Press any key to continue..." -n1 -s
+      #source ./test_eth_block.sh
       ;;        
     8)
-      read -p "Enter version to use for release setup (e.g. 0.7.0): " release_version
-      echo
-      info "Running release_setup.sh with version '$release_version'..."
-      ./release_setup.sh "$release_version"
+      info "Running install_setup_public.sh..."
+      source ./install_setup_public.sh || :
       ;;
     9)
+      info "Running install_setup_local.sh..."
+      source ./install_setup_local.sh || :
+      ;;  
+    10)
       info "Open shell"
       bash
       ;;   
-    0)
+    11)
       info "Exiting ZisK Release Kit. Goodbye!"
       exit
       ;;

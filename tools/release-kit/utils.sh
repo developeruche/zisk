@@ -10,7 +10,8 @@ RESET=$(tput sgr0)
 ensure() {
     if ! "$@"; then
         echo "${RED}❌ Error: command failed -> $*${RESET}" >&2
-        exit 1
+        read -p "Press any key to continue..." -n1 -s
+        return 1
     fi
 }
 
@@ -25,12 +26,13 @@ info() {
 }
 
 warn() {
-    echo "${BOLD}${GREEN}⚠️  $1${RESET}"
+    echo "${BOLD}${GREEN}🚨  $1${RESET}"
 }
 
 err() {
     echo "${RED}❌ Error: $1${RESET}" >&2
-    exit 1
+    read -p "Press any key to continue..." -n1 -s
+    return 1
 }
 
 success() {
@@ -40,7 +42,7 @@ success() {
 load_env() {
     if [[ ! -f ".env" ]]; then
         err "❌ No .env file found. Please create one with the required environment variables."
-        exit 1
+        return 1
     fi
 
     # Load environment variables from .env file ignoring comments and empty lines
@@ -48,7 +50,7 @@ load_env() {
 
     if [[ -z "${ENV_VARS}" ]]; then
         err "❌ .env file is empty or contains only comments. Please define the required environment variables."
-        exit 1
+        return 1
     fi
 
     info "📦 Loading environment variables from .env"
@@ -69,6 +71,6 @@ confirm_continue() {
 
     if [[ "$answer" != [Yy]* ]]; then
         echo "Aborted."
-        exit 1
+        return 1
     fi
 }
