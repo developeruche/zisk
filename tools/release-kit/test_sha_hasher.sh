@@ -30,42 +30,42 @@ main() {
     ensure ziskemu -e "$ELF_PATH" -i "$INPUT_BIN" | tee ziskemu_output.log
     if ! grep -qE ${EXPECTED_OUTPUT} ziskemu_output.log; then
         err "run ziskemu failed"
-        exit 1
+        return 1
     fi
 
     step "Runing program with cargo-zisk run..."
     ensure cargo-zisk run --release -i build/input.bin | tee run_output.log
     if ! grep -qE ${EXPECTED_OUTPUT} run_output.log; then
         err "run program failed"
-        exit 1
+        return 1
     fi
 
     step "Generating program setup..."
     ensure cargo-zisk rom-setup -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher 2>&1 | tee romsetup_output.log
     if ! grep -F "ROM setup successfully completed" romsetup_output.log; then
         err "program setup failed"
-        exit 1
+        return 1
     fi
 
     step "Verifying constraints..."
     ensure cargo-zisk verify-constraints -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin 2>&1 | tee constraints_output.log
     if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
         err "verify constraints failed"
-        exit 1
+        return 1
     fi
 
     step "Generating proof..."  
     ensure cargo-zisk prove -e target/riscv64ima-polygon-ziskos-elf/release/sha_hasher -i build/input.bin -o proof -a -y 2>&1 | tee prove_output.log
     if ! grep -F "Vadcop Final proof was verified" prove_output.log; then
         err "prove program failed"
-        exit 1
+        return 1
     fi
 
     step "Verifying proof..."
     ensure cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json 2>&1 | tee verify_output.log
     if ! grep -F "Stark proof was verified" verify_output.log; then
         err "verify proof failed"
-        exit 1
+        return 1
     fi          
 
     success "Program $PROJECT_NAME has been successfully proved!"

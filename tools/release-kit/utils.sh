@@ -11,6 +11,7 @@ ensure() {
     if ! "$@"; then
         echo "${RED}❌ Error: command failed -> $*${RESET}" >&2
         read -p "Press any key to continue..." -n1 -s
+        echo
         return 1
     fi
 }
@@ -32,6 +33,7 @@ warn() {
 err() {
     echo "${RED}❌ Error: $1${RESET}" >&2
     read -p "Press any key to continue..." -n1 -s
+    echo
     return 1
 }
 
