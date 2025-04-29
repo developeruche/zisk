@@ -68,6 +68,8 @@ main() {
         return 1
     fi          
 
+    cd ..
+    
     success "Program $PROJECT_NAME has been successfully proved!"
 }
 
