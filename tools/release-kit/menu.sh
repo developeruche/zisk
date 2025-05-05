@@ -2,6 +2,8 @@
 
 source ./utils.sh
 
+WORK_DIR=$(pwd)
+
 # Loop until user chooses to exit
 while true; do
   echo "==============================="
@@ -50,9 +52,8 @@ while true; do
       source ./test_pp.sh || :
       ;;  
     7)
-      warn "Not yet implemented"
-      read -p "Press any key to continue..." -n1 -s
-      #source ./test_eth_block.sh
+      info "Running test_eth_block.sh"
+      source ./test_eth_block.sh || :
       ;;        
     8)
       info "Running install_setup_public.sh..."
@@ -71,9 +72,14 @@ while true; do
       exit
       ;;
     *)
-      info "Invalid selection. Please enter a number between 0 and 5."
+      info "Invalid selection. Please enter a number between 1 and 11."
       ;;
   esac
 
   echo
+
+  cd "$WORK_DIR" || {
+    err "Failed to change directory to $WORK_DIR"
+    exit 1
+  }
 done

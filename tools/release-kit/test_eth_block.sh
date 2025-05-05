@@ -11,7 +11,7 @@ main() {
     load_env || return 1
     confirm_continue || return 1
 
-    ELF_FILE="pessimistic-proof-program-keccakf-v0.7.0.elf"
+    ELF_FILE="zisk-eth-client-keccakf-ecrecover.elf"
     MPI_CMD="mpirun --bind-to none -np $DISTRIBUTED_PROCESSES -x OMP_NUM_THREADS=$DISTRIBUTED_THREADS"
 
     PROVE_FLAGS="-a -y"
@@ -23,41 +23,41 @@ main() {
     step "Deleting shared memory..."
     rm -rf /dev/shm/SHM*
 
-    step  "Cloning zisk-testvectors repository..."
+    step "Cloning zisk-testvectors repository..."
     rm -rf zisk-testvectors
     ensure git clone https://github.com/0xPolygonHermez/zisk-testvectors.git || return 1
     cd zisk-testvectors
 
     step "Generating pessimistic program setup..."
-    ensure cargo-zisk rom-setup -e "pessimistic-proof/program/${ELF_FILE}" 2>&1 | tee romsetup_output.log || return 1
+    ensure cargo-zisk rom-setup -e "eth-client/program/elf/${ELF_FILE}" 2>&1 | tee romsetup_output.log || return 1
     if ! grep -F "ROM setup successfully completed" romsetup_output.log; then
         err "program setup failed"
         return 1
     fi
 
-    step "Verifying constraints for pp_input_1_1.bin..."
-    ensure cargo-zisk verify-constraints -e "pessimistic-proof/program/${ELF_FILE}" -i "pessimistic-proof/inputs/bench/pp_input_1_1.bin" 2>&1 | tee constraints_output.log || return 1
+    step "Verifying constraints for 20852412_38_3.bin..."
+    ensure cargo-zisk verify-constraints -e "eth-client/program/elf/${ELF_FILE}" -i "eth-client/inputs/20852412_38_3.bin" 2>&1 | tee constraints_output.log || return 1
     if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
         err "verify constraints failed"
         return 1
     fi
 
-    step "Generating pessimistic proof for pp_input_1_1.bin (non-distributed)..."  
-    ensure cargo-zisk prove -e "pessimistic-proof/program/${ELF_FILE}" -i "pessimistic-proof/inputs/bench/pp_input_1_1.bin" -o proof $PROVE_FLAGS 2>&1 | tee prove_output.log || return 1
+    step "Generating proof for block 20852412_38_3.bin (distributed)..."  
+    ensure $MPI_CMD cargo-zisk prove -e "eth-client/program/elf/${ELF_FILE}" -i "eth-client/inputs/20852412_38_3.bin" -o proof $PROVE_FLAGS 2>&1 | tee prove_output.log || return 1
     if ! grep -F "Vadcop Final proof was verified" prove_output.log; then
         err "prove program failed"
         return 1
     fi
 
-    step "Verifying pressimistic proof for pp_input_1_1.bin..."
+    step "Verifying proof for block 20852412_38_3.bin..."
     ensure cargo-zisk verify -p ./proof/proofs/vadcop_final_proof.json -u ./proof/publics.json 2>&1 | tee verify_output.log || return 1
     if ! grep -F "Stark proof was verified" verify_output.log; then
         err "verify proof failed"
         return 1
     fi
 
-    step "Generating pessimistic proof for pp_input_20_20.bin (distributed)..."  
-    ensure $MPI_CMD cargo-zisk prove -e "pessimistic-proof/program/${ELF_FILE}" -i "pessimistic-proof/inputs/bench/pp_input_20_20.bin" -o proof $PROVE_FLAGS 2>&1 | tee prove_output.log || return 1
+    step "Generating proof for block 21077746_52_27.bin (distributed)..."  
+    ensure $MPI_CMD cargo-zisk prove -e "eth-client/program/elf/${ELF_FILE}" -i "eth-client/inputs/21077746_52_27.bin" -o proof $PROVE_FLAGS 2>&1 | tee prove_output.log || return 1
     if ! grep -F "Vadcop Final proof was verified" prove_output.log; then
         err "prove program failed"
         return 1
@@ -65,7 +65,7 @@ main() {
 
     cd ..
 
-    success "Pessimistic proof has been successfully proved!"
+    success "Ethereum blocks has been successfully proved!"
 }
 
 main || return 1

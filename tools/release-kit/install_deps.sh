@@ -15,19 +15,19 @@ main() {
         curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
         nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
         libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
-        sudo ca-certificates gnupg lsb-release wget libclang-dev clang > /dev/null
+        sudo ca-certificates gnupg lsb-release wget libclang-dev clang > /dev/null || return 1
 
     step "Installing Node.js 20.x..."
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - > /dev/null
-    ensure sudo apt-get install -y nodejs > /dev/null
+    ensure sudo apt-get install -y nodejs > /dev/null || return 1
 
     step "Installing Rust..."
-    ensure curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    ensure curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || return 1
     export PATH="${HOME}/.cargo/bin:$PATH"
     source "${HOME}/.cargo/env"
 
     step "Installing nano editor..."
-    ensure sudo apt-get install -y nano > /dev/null  
+    ensure sudo apt-get install -y nano > /dev/null || return 1
 
     echo
 }
