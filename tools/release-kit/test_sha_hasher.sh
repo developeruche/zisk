@@ -10,9 +10,14 @@ main() {
     current_step=1
     total_steps=10
 
+    is_proving_key_installed || return 1
+    
     step "Loading environment variables..."    
     load_env || return 1
     confirm_continue || return 1
+
+    mkdir -p "${HOME}/work"
+    cd "${HOME}/work"
 
     PROVE_FLAGS="-a -y"
     if [[ "$DISABLE_ASSEMBLY" == "1" ]]; then
@@ -21,7 +26,7 @@ main() {
     fi
 
     step "Deleting shared memory..."
-    rm -rf /dev/shm/SHM*
+    rm -rf /dev/shm/ZISK*
 
     step "Creating new ZisK program: $PROJECT_NAME"
     rm -rf "$PROJECT_NAME"

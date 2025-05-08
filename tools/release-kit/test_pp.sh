@@ -7,9 +7,14 @@ main() {
     current_step=1
     total_steps=8
 
+    is_proving_key_installed || return 1
+    
     step "Loading environment variables..."
     load_env || return 1
     confirm_continue || return 1
+
+    mkdir -p "${HOME}/work"
+    cd "${HOME}/work"
 
     ELF_FILE="pessimistic-proof-program-keccakf-v0.7.0.elf"
     MPI_CMD="mpirun --bind-to none -np $DISTRIBUTED_PROCESSES -x OMP_NUM_THREADS=$DISTRIBUTED_THREADS"
@@ -21,7 +26,7 @@ main() {
     fi
 
     step "Deleting shared memory..."
-    rm -rf /dev/shm/SHM*
+    rm -rf /dev/shm/ZISK*
 
     step  "Cloning zisk-testvectors repository..."
     rm -rf zisk-testvectors

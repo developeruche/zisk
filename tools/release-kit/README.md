@@ -35,7 +35,7 @@ If the container already exists, you will be asked whether you want to connect t
    Builds the setup files (proving key) using the `pil2-proofman`, `pil2-proofman-js`, and `pil2-compiler` repository sources (checking out the branches specified in the environment variables).  
    After building, it installs the proving key to the `$HOME/.zisk` folder and generates the constant files using the `cargo-zisk check-setup` command.
 
-4. **Build setup artifacts**  
+4. **Package setup outcome**  
    Packages the setup artifacts (`.tar.gz` and `.md5` files for proving and verifying keys) using the setup files generated in option 3.  
    The artifacts are stored in the `${HOME}/output` directory inside the container, which is mapped to the `./output` folder on the host, making them available externally.
 
@@ -48,7 +48,8 @@ If the container already exists, you will be asked whether you want to connect t
    It first proves in non-distributed mode using the `pp_input_1_1.bin` input file, and then in distributed mode using the `pp_input_20_20.bin` input file.
 
 7. **Test Ethereum block**  
-   _Not yet implemented._
+   Tests Ethereum blocks proof generation using the files from the `zisk-testvectors` repository.
+   It proves blocks 20852412 (38 txs, 3 MGas) and 21077746 (52 txs, 27 MGas) in distributed mode.
 
 8. **Install setup from public artifacts**  
    Downloads and installs the proving key files from the public artifacts corresponding to the `SETUP_VERSION` environment variable.  

@@ -10,6 +10,9 @@ main() {
     load_env || return 1
     confirm_continue || return 1
 
+    mkdir -p "${HOME}/work"
+    cd "${HOME}/work"
+
     step  "Cloning pil2-compiler, pil2-proofman and pil2-proofman-js repos..."
 
     # Remove existing directories if they exist
@@ -22,8 +25,8 @@ main() {
     cd pil2-compiler
     # If PIL2_COMPILER_BRANCH is defined, check out the specified branch
     if [[ -n "$PIL2_COMPILER_BRANCH" ]]; then
-      echo "Checking out branch '$PIL2_COMPILER_BRANCH' for pil2-compiler..."
-      ensure git checkout "$PIL2_COMPILER_BRANCH" || return 1
+        echo "Checking out branch '$PIL2_COMPILER_BRANCH' for pil2-compiler..."
+        ensure git checkout "$PIL2_COMPILER_BRANCH" || return 1
     fi
     rm -rf package-lock.json
     rm -rf node_modules
@@ -33,8 +36,8 @@ main() {
     cd pil2-proofman
     # If PIL2_PROOFMAN_BRANCH is defined, check out the specified branch
     if [[ -n "$PIL2_PROOFMAN_BRANCH" ]]; then
-      echo "Checking out branch '$PIL2_PROOFMAN_BRANCH' for pil2-proofman..."
-      ensure git checkout "$PIL2_PROOFMAN_BRANCH" || return 1
+        echo "Checking out branch '$PIL2_PROOFMAN_BRANCH' for pil2-proofman..."
+        ensure git checkout "$PIL2_PROOFMAN_BRANCH" || return 1
     fi
     cd ..
 
@@ -42,8 +45,8 @@ main() {
     cd pil2-proofman-js
     # If PIL2_PROOFMAN_JS_BRANCH is defined, check out the specified branch
     if [[ -n "$PIL2_PROOFMAN_JS_BRANCH" ]]; then
-      echo "Checking out branch '$PIL2_PROOFMAN_JS_BRANCH' for pil2-proofman-js..."
-      ensure git checkout "$PIL2_PROOFMAN_JS_BRANCH" || return 1
+        echo "Checking out branch '$PIL2_PROOFMAN_JS_BRANCH' for pil2-proofman-js..."
+        ensure git checkout "$PIL2_PROOFMAN_JS_BRANCH" || return 1
     fi
     rm -rf package-lock.json
     rm -rf node_modules

@@ -76,3 +76,17 @@ confirm_continue() {
         return 1
     fi
 }
+
+press_any_key() {
+    read -p "Press any key to continue..." -n1 -s
+    echo
+}
+
+is_proving_key_installed() {
+    if [[ -d "$HOME/.zisk/provingKey" ]]; then
+        return 0
+    else
+        err "Proving key not installed. Please install it first."
+        return 1    
+    fi
+}

@@ -7,9 +7,14 @@ main() {
     current_step=1
     total_steps=8
 
+    is_proving_key_installed || return 1
+
     step "Loading environment variables..."
     load_env || return 1
     confirm_continue || return 1
+
+    mkdir -p "${HOME}/work"
+    cd "${HOME}/work"
 
     ELF_FILE="zisk-eth-client-keccakf-ecrecover.elf"
     MPI_CMD="mpirun --bind-to none -np $DISTRIBUTED_PROCESSES -x OMP_NUM_THREADS=$DISTRIBUTED_THREADS"
@@ -21,14 +26,14 @@ main() {
     fi
 
     step "Deleting shared memory..."
-    rm -rf /dev/shm/SHM*
+    rm -rf /dev/shm/ZISK*
 
     step "Cloning zisk-testvectors repository..."
     rm -rf zisk-testvectors
     ensure git clone https://github.com/0xPolygonHermez/zisk-testvectors.git || return 1
     cd zisk-testvectors
 
-    step "Generating pessimistic program setup..."
+    step "Generating eth-client program setup..."
     ensure cargo-zisk rom-setup -e "eth-client/program/elf/${ELF_FILE}" 2>&1 | tee romsetup_output.log || return 1
     if ! grep -F "ROM setup successfully completed" romsetup_output.log; then
         err "program setup failed"

@@ -12,7 +12,6 @@ main() {
     load_env || return 1
     confirm_continue || return 1
 
-
     step "Compress proving key..."
     cd zisk/build
     ensure tar -czvf "zisk-provingkey-${SETUP_VERSION}.tar.gz" provingKey/ || return 1
@@ -30,10 +29,10 @@ main() {
     cd ../..
 
     step "Move files to output folder..."
-    ensure sudo mv "./zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "./zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "./zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "./zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "./zisk/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "./zisk/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "./zisk/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "./zisk/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
 }
 
 main || return 1

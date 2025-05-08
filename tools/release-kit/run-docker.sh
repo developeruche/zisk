@@ -26,6 +26,19 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
         [Nn])
             info "🚨 Removing existing container..."
             docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+            
+            info "🔨 Building docker image: ${IMAGE_NAME}..."
+            docker build -t "${IMAGE_NAME}" .
+
+            info "🚀 Running docker container..."
+            docker run -dit --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash
+            info "📜 Container '${CONTAINER_NAME}' is now running."
+
+            info "📦 Installing ZisK dependencies..."
+            docker exec -u ziskuser -it "${CONTAINER_NAME}" bash -i -c "./install_deps.sh"
+
+            info "🔑 Accessing the container now..."
+            docker exec -u ziskuser -it ${CONTAINER_NAME} bash -i -c "sudo chmod 777 /home/ziskuser/output; ./menu.sh"            
             ;;
         *)
             echo "❌ Invalid option: '$answer'. Please enter 'y' or 'n'."
@@ -33,19 +46,6 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
             ;;
     esac
 fi
-
-info "🔨 Building docker image: ${IMAGE_NAME}..."
-docker build -t "${IMAGE_NAME}" .
-
-info "🚀 Running docker container..."
-docker run -dit --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash
-info "📜 Container '${CONTAINER_NAME}' is now running."
-
-info "📦 Installing ZisK dependencies..."
-docker exec -u ziskuser -it "${CONTAINER_NAME}" bash -i -c "./install_deps.sh"
-
-info "🔑 Accessing the container now..."
-docker exec -u ziskuser -it ${CONTAINER_NAME} bash -i -c "sudo chmod 777 /home/ziskuser/output; ./menu.sh"
 
 echo
 info "${BOLD}To access the container, run:${RESET} docker exec -it ${CONTAINER_NAME}  bash -i -c "./menu.sh""
