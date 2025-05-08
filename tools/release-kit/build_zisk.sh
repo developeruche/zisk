@@ -81,7 +81,7 @@ main() {
     step "Copying binaries to ${HOME}/.zisk/bin..."
     mkdir -p "$HOME/.zisk/bin"
     ensure cp target/release/cargo-zisk target/release/ziskemu target/release/riscv2zisk \
-        target/release/libzisk_witness.so sha256f_script.json "$HOME/.zisk/bin" || return 1
+        target/release/libzisk_witness.so precompiles/sha256f/src/sha256f_script.json "$HOME/.zisk/bin" || return 1
 
     if [[ -f "precompiles/keccakf/src/keccakf_script.json" ]]; then
         warn "keccakf_script.json file found. This should exist only if building version 0.7.0 or earlier. Copying it to ~/.zisk/bin..."
