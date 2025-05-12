@@ -2,7 +2,7 @@
 
 source ./utils.sh
 
-$OUTPUT_DIR="./output"
+OUTPUT_DIR="${HOME}/output"
 
 main() {
     current_step=1
@@ -32,10 +32,10 @@ main() {
     cd ../..
 
     step "Move files to output folder..."
-    ensure sudo mv "${HOME}work/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "${HOME}work/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "${HOME}work/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
-    ensure sudo mv "${HOME}work/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "${HOME}/work/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "${HOME}/work/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "${HOME}/work/zisk/build/zisk-provingkey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
+    ensure sudo mv "${HOME}/work/zisk/build/zisk-verifykey-${SETUP_VERSION}.tar.gz.md5" "${OUTPUT_DIR}" || return 1
 }
 
 main || return 1
