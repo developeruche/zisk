@@ -74,12 +74,12 @@ main() {
 
     step  "Generate fixed data..."
     ensure cargo run --release --bin keccakf_fixed_gen || return 1
-    mkdir -p build
-    ensure mv precompiles/keccakf/src/keccakf_fixed.bin build || return 1
+    ensure cargo run --release --bin sha256f_fixed_gen || return 1
 
     step  "Generate setup data..."
-    ensure node --max-old-space-size=65536 ../pil2-proofman-js/src/main_setup.js \
-        -a ./pil/zisk.pilout -b build -i ./build/keccakf_fixed.bin -r || return 1
+    ensure node --max-old-space-size=131072 ../pil2-proofman-js/src/main_setup.js \
+        -a ./pil/zisk.pilout -b build \
+        -i precompiles/keccakf/src/keccakf_fixed.bin precompiles/sha256f/src/sha256f_fixed.bin -r || return 1
 
     step "Copy provingKey directory to \$HOME/.zisk directory..."
     ensure cp -R build/provingKey "$HOME/.zisk" || return 1
