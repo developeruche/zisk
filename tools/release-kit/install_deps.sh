@@ -32,4 +32,4 @@ main() {
     echo
 }
 
-main || return 1
+main

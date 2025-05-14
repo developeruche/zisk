@@ -61,7 +61,12 @@ main() {
     step  "Building ZisK tools..."
     ensure cargo clean || return 1
     ensure cargo update || return 1
-    if ! (cargo build --release); then
+    BUILD_FEATURES=""
+    if [[ "${BUILD_GPU}" == "1" ]]; then
+        BUILD_FEATURES="--features gpu"
+        warn "Building with GPU support. This may take a while..."
+    fi    
+    if ! (cargo build --release ${BUILD_FEATURES}); then
         warn "Build failed. Trying to fix missing stddef.h..."
 
         stddef_path=$(find /usr -name "stddef.h" 2>/dev/null | head -n 1)
@@ -75,7 +80,7 @@ main() {
         export CPLUS_INCLUDE_PATH=$C_INCLUDE_PATH
 
         info  "Retrying build..."
-        ensure cargo build --release || return 1
+        ensure cargo build --release ${BUILD_FEATURES} || return 1
     fi
 
     step "Copying binaries to ${HOME}/.zisk/bin..."

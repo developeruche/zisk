@@ -27,6 +27,7 @@ main() {
 
     step "Deleting shared memory..."
     rm -rf /dev/shm/ZISK*
+    rm -rf /dev/shm/sem*
 
     step "Creating new ZisK program: $PROJECT_NAME"
     rm -rf "$PROJECT_NAME"

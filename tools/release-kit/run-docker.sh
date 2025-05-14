@@ -38,7 +38,7 @@ info "🔨 Building docker image: ${IMAGE_NAME}..."
 docker build -t "${IMAGE_NAME}" .
 
 info "🚀 Running docker container..."
-docker run -dit --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash
+docker run -dit --shm-size=2g --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash
 info "📜 Container '${CONTAINER_NAME}' is now running."
 
 info "📦 Installing ZisK dependencies..."

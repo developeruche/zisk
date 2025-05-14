@@ -27,6 +27,7 @@ main() {
 
     step "Deleting shared memory..."
     rm -rf /dev/shm/ZISK*
+    rm -rf /dev/shm/sem*
 
     step  "Cloning zisk-testvectors repository..."
     rm -rf zisk-testvectors

@@ -4,6 +4,7 @@
 BOLD=$(tput bold)
 GREEN=$(tput setaf 2)
 RED=$(tput setaf 1)
+YELLOW=$(tput setaf 3)
 RESET=$(tput sgr0)
 
 # Helper to run and log
