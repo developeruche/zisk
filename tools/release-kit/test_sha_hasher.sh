@@ -37,7 +37,7 @@ main() {
     step "Building program..."
     ensure cargo-zisk build --release || return 1
 
-    ELF_PATH="target/riscv64ima-polygon-ziskos-elf/release/$PROJECT_NAME"
+    ELF_PATH="target/riscv64ima-zisk-zkvm-elf/release/$PROJECT_NAME"
     INPUT_BIN="build/input.bin"
 
     step "Running program with ziskemu..."
