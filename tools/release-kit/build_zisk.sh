@@ -64,7 +64,7 @@ main() {
     BUILD_FEATURES=""
     if [[ "${BUILD_GPU}" == "1" ]]; then
         BUILD_FEATURES="--features gpu"
-        warn "Building with GPU support. This may take a while..."
+        warn "Building with GPU support..."
     fi    
     if ! (cargo build --release ${BUILD_FEATURES}); then
         warn "Build failed. Trying to fix missing stddef.h..."
