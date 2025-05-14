@@ -42,10 +42,15 @@ main() {
     fi
 
     step "Verifying constraints for pp_input_1_1.bin..."
-    ensure cargo-zisk verify-constraints -e "pessimistic-proof/program/${ELF_FILE}" -i "pessimistic-proof/inputs/bench/pp_input_1_1.bin" 2>&1 | tee constraints_output.log || return 1
-    if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
-        err "verify constraints failed"
-        return 1
+    step "Verifying constraints..."
+    if [[ "${BUILD_GPU}" == "1" ]]; then
+        warn "Skipping verify constraints step for GPU mode (not supported yet)"
+    else    
+        ensure cargo-zisk verify-constraints -e "pessimistic-proof/program/${ELF_FILE}" -i "pessimistic-proof/inputs/bench/pp_input_1_1.bin" 2>&1 | tee constraints_output.log || return 1
+        if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
+            err "verify constraints failed"
+            return 1
+        fi
     fi
 
     step "Generating pessimistic proof for pp_input_1_1.bin (non-distributed)..."  

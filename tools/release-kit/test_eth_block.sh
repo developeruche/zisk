@@ -42,10 +42,15 @@ main() {
     fi
 
     step "Verifying constraints for 20852412_38_3.bin..."
-    ensure cargo-zisk verify-constraints -e "eth-client/program/elf/${ELF_FILE}" -i "eth-client/inputs/20852412_38_3.bin" 2>&1 | tee constraints_output.log || return 1
-    if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
-        err "verify constraints failed"
-        return 1
+    step "Verifying constraints..."
+    if [[ "${BUILD_GPU}" == "1" ]]; then
+        warn "Skipping verify constraints step for GPU mode (not supported yet)"
+    else    
+        ensure cargo-zisk verify-constraints -e "eth-client/program/elf/${ELF_FILE}" -i "eth-client/inputs/20852412_38_3.bin" 2>&1 | tee constraints_output.log || return 1
+        if ! grep -F "All global constraints were successfully verified" constraints_output.log; then
+            err "verify constraints failed"
+            return 1
+        fi
     fi
 
     step "Generating proof for block 20852412_38_3.bin (distributed)..."  
