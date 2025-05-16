@@ -1,16 +1,17 @@
-
 FROM ubuntu:22.04
 
 # Prevent interactive prompts during package installations
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a non-root user and group with UID and GID 1000
-RUN groupadd --gid 1000 ziskuser && \
-    useradd --uid 1000 --gid 1000 --create-home ziskuser
+# Install bash and sudo
+RUN apt update && apt install -y bash sudo
 
-# Install sudo and allow passwordless sudo for the user
-RUN apt update && apt install -y sudo && \
-    echo "ziskuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Create a non-root user and group with UID and GID 1000, and set default shell to /bin/bash
+RUN groupadd --gid 1000 ziskuser && \
+    useradd --uid 1000 --gid 1000 --create-home --shell /bin/bash ziskuser
+
+# Allow passwordless sudo for the user
+RUN echo "ziskuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Prepare /output directory with correct permissions
 RUN mkdir -p /home/ziskuser/output && chown ziskuser:ziskuser /home/ziskuser/output

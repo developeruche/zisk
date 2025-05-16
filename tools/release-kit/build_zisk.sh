@@ -72,7 +72,7 @@ main() {
         stddef_path=$(find /usr -name "stddef.h" 2>/dev/null | head -n 1)
         if [ -z "$stddef_path" ]; then
             err "stddef.h not found. You may need to install gcc headers."
-            exit 1
+            return 1
         fi
 
         include_dir=$(dirname "$stddef_path")
@@ -101,7 +101,7 @@ main() {
     a
     step "Adding ~/.zisk/bin to PATH..."
     echo 'export PATH="$PATH:$HOME/.zisk/bin"' >> "$HOME/.bashrc"
-    export PATH="$PATH:$HOME/.zisk/bin"
+    #export PATH="$PATH:$HOME/.zisk/bin"
     source "$HOME/.bashrc"
 
     step "Installing ZisK Rust toolchain..."
@@ -110,7 +110,7 @@ main() {
     step "Verifying toolchain installation..."
     rustup toolchain list | grep zisk || {
         err "ZisK toolchain not found."
-        exit 1
+        return 1
     }
 
     cd ..
