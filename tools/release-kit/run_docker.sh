@@ -4,7 +4,7 @@ set -e
 
 source ./utils.sh
 
-IMAGE_NAME="zisk-image"
+IMAGE_NAME="zisk-release-kit"
 CONTAINER_NAME="zisk-docker"
 OUTPUT_DIR="./output"
 
@@ -25,7 +25,8 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
             ;;
         [Nn])
             info "🚨 Removing existing container..."
-            docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+            docker stop "${CONTAINER_NAME}" >/dev/null
+            docker rm -f "${CONTAINER_NAME}" >/dev/null
             ;;
         *)
             echo "❌ Invalid option: '$answer'. Please enter 'y' or 'n'."
@@ -34,15 +35,8 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
     esac
 fi
 
-info "🔨 Building docker image: ${IMAGE_NAME}..."
-docker build -t "${IMAGE_NAME}" .
-
-info "🚀 Running docker container..."
-docker run -dit --shm-size=2g --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash -l
-info "📜 Container '${CONTAINER_NAME}' is now running."
-
-info "📦 Installing ZisK dependencies..."
-docker exec -u ziskuser -it "${CONTAINER_NAME}" bash -i -c "./install_deps.sh"
+info "🚀 Running docker container ${CONTAINER_NAME}..."
+docker run -dit --shm-size=2g --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash -l >/dev/null
 
 info "🔑 Accessing the container now..."
 docker exec -u ziskuser -it ${CONTAINER_NAME} bash -i -c "sudo chmod 777 /home/ziskuser/output; ./menu.sh"
