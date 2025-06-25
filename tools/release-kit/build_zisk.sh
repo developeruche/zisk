@@ -4,41 +4,47 @@ source ./utils.sh
 
 main() {
     current_step=1
-    total_steps=8
+    total_steps=10
 
     step "Loading environment variables..."
     load_env || return 1
     confirm_continue || return 1
 
-    if [[ -n "$PIL2_PROOFMAN_BRANCH" ]]; then
-        total_steps=10
-    fi
+    source $HOME/.cargo/env
 
     mkdir -p "${HOME}/work"
     cd "${HOME}/work"
 
+    step "Cloning pil2-proofman repository..."
     if [[ -n "$PIL2_PROOFMAN_BRANCH" ]]; then
-        step "Cloning pil2-proofman repository..."
         # Remove existing directory if it exists
         rm -rf pil2-proofman
         # Clone pil2-proofman repository
         ensure git clone https://github.com/0xPolygonHermez/pil2-proofman.git || return 1
         cd pil2-proofman
-        echo "Checking out branch '$PIL2_PROOFMAN_BRANCH' for pil2-proofman..."
+        info "Checking out branch '$PIL2_PROOFMAN_BRANCH' for pil2-proofman..."
         ensure git checkout "$PIL2_PROOFMAN_BRANCH" || return 1
         cd ..
-    fi  
+    else
+        info "Skipping cloning pil2-proofman repository. Pulling existing repository"
+        ensure cd pil2-proofman
+        ensure git pull
+    fi
 
     step  "Cloning ZisK repository..."
-    # Remove existing directory if it exists
-    rm -rf zisk
-    # Clone ZisK repository
-    ensure git clone https://github.com/0xPolygonHermez/zisk.git || return 1
-    cd zisk
-    # If the ZISK_BRANCH environment variable is defined and not empty, check out that branch
     if [[ -n "$ZISK_BRANCH" ]]; then
+        # Remove existing directory if it exists
+        rm -rf zisk
+        # Clone ZisK repository
+        ensure git clone https://github.com/0xPolygonHermez/zisk.git || return 1
+        ensure cd zisk
+	# If the ZISK_BRANCH environment variable is defined and not empty, check out that branch
         info "Checking out branch '$ZISK_BRANCH'..."
         ensure git checkout "$ZISK_BRANCH" || return 1
+    else
+        info "Skipping cloning zisk repository. Pulling existing repository"
+        ensure cd zisk
+        ensure git pull || return 1
     fi
 
     if [[ -n "$PIL2_PROOFMAN_BRANCH" ]]; then
@@ -59,7 +65,7 @@ main() {
             replacement="$crate = ${replacements[$crate]}"
             sed -i -E "s~$pattern~$replacement~" Cargo.toml
         done
-    fi  
+    fi
 
     step  "Building ZisK tools..."
     ensure cargo clean || return 1
@@ -68,7 +74,7 @@ main() {
     if [[ "${BUILD_GPU}" == "1" ]]; then
         BUILD_FEATURES="--features gpu"
         warn "Building with GPU support..."
-    fi    
+    fi
     if ! (cargo build --release ${BUILD_FEATURES}); then
         warn "Build failed. Trying to fix missing stddef.h..."
 
@@ -104,7 +110,7 @@ main() {
     a
     step "Adding ~/.zisk/bin to PATH..."
     echo 'export PATH="$PATH:$HOME/.zisk/bin"' >> "$HOME/.bashrc"
-    #export PATH="$PATH:$HOME/.zisk/bin"
+    # export PATH="$PATH:$HOME/.zisk/bin"
     source "$HOME/.bashrc"
 
     step "Installing ZisK Rust toolchain..."

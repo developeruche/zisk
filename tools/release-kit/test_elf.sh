@@ -103,7 +103,7 @@ test_elf() {
     num_dist_inputs=${#dist_inputs[@]}
 
     current_step=1
-    total_steps=$(( 3 + num_inputs * 3 + num_dist_inputs ))
+    total_steps=$(( 2 + num_inputs * 3 + num_dist_inputs ))
 
     # Create directories for proof results
     PROOF_RESULTS_DIR="${HOME}/work/proof-results"
@@ -125,8 +125,8 @@ test_elf() {
         warn "Emulator assembly disabled: using -l flag in cargo-zisk prove"
     fi
 
-    step "Deleting shared memory..."
-    rm -rf /dev/shm/ZISK* /dev/shm/sem*
+    # step "Deleting shared memory..."
+    # rm -rf /dev/shm/ZISK* /dev/shm/sem*
 
     step "Cloning zisk-testvectors repository..."
     rm -rf zisk-testvectors
@@ -144,7 +144,7 @@ test_elf() {
         err "program setup failed"
         return 1
     fi
-   
+
     # Process inputs in non-distributed
     if [ ${num_inputs} -gt 0 ]; then
         for input_file in "${inputs[@]}"; do

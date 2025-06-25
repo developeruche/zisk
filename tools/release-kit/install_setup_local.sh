@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ./utils.sh
-#source "$HOME/.bashrc"
+source "$HOME/.bashrc"
 
 OUTPUT_DIR="${HOME}/output"
 
