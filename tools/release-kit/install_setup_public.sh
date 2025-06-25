@@ -12,7 +12,7 @@ main () {
     confirm_continue || return 1
 
     step  "Downloading public proving key version ${SETUP_VERSION}..."
-    ensure curl -L -#o "zisk-provingkey-${SETUP_VERSION}.tar.gz" "https://storage.googleapis.com/zisk/zisk-provingkey-${SETUP_VERSION}.tar.gz" || return 1
+    ensure curl -L -#o "zisk-provingkey-${SETUP_VERSION}.tar.gz" "https://storage.googleapis.com/zisk-setup/zisk-provingkey-${SETUP_VERSION}.tar.gz" || return 1
 
     step "Installing public proving key version ${SETUP_VERSION}..."
     rm -rf "$HOME/.zisk/provingKey/"
