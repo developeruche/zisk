@@ -51,10 +51,13 @@ main() {
         ["proofman-util"]='{ path = "../pil2-proofman/util" }'
         ["pil-std-lib"]='{ path = "../pil2-proofman/pil2-components/lib/std/rs" }'
         ["witness"]='{ path = "../pil2-proofman/witness" }'
+        ["fields"]='{ path = "../pil2-proofman/fields" }'
         )
-        # Iterate over the replacemnts and update the Cargo.toml file
+        # Iterate over the replacements and update the Cargo.toml file
         for crate in "${!replacements[@]}"; do
-        sed -i -E "s|^$crate = \{ git = \"https://github.com/0xPolygonHermez/pil2-proofman.git\", tag = \".*\" *\}|$crate = ${replacements[$crate]}|" Cargo.toml
+            pattern="^$crate = \\{ git = \\\"https://github.com/0xPolygonHermez/pil2-proofman.git\\\", (tag|branch) = \\\".*\\\" *\\}"
+            replacement="$crate = ${replacements[$crate]}"
+            sed -i -E "s~$pattern~$replacement~" Cargo.toml
         done
     fi  
 
@@ -86,7 +89,7 @@ main() {
     step "Copying binaries to ${HOME}/.zisk/bin..."
     mkdir -p "$HOME/.zisk/bin"
     ensure cp target/release/cargo-zisk target/release/ziskemu target/release/riscv2zisk \
-        target/release/libzisk_witness.so precompiles/sha256f/src/sha256f_script.json "$HOME/.zisk/bin" || return 1
+        target/release/libzisk_witness.so target/release/libziskclib.a precompiles/sha256f/src/sha256f_script.json "$HOME/.zisk/bin" || return 1
 
     if [[ -f "precompiles/keccakf/src/keccakf_script.json" ]]; then
         warn "keccakf_script.json file found. This should exist only if building version 0.7.0 or earlier. Copying it to ~/.zisk/bin..."

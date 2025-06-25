@@ -36,7 +36,7 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
 fi
 
 info "🚀 Running docker container ${CONTAINER_NAME}..."
-docker run -dit --shm-size=2g --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash -l >/dev/null
+docker run -dit --shm-size=32g --name "${CONTAINER_NAME}" -v "$(realpath "${OUTPUT_DIR}"):/home/ziskuser/output" "${IMAGE_NAME}" bash -l >/dev/null
 
 info "🔑 Accessing the container now..."
 docker exec -u ziskuser -it ${CONTAINER_NAME} bash -i -c "sudo chmod 777 /home/ziskuser/output; ./menu.sh"

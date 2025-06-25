@@ -42,7 +42,7 @@ while true; do
         ;;
         4)
         info "Running package_setup.sh..."
-        bash -i./package_setup.sh || :
+        bash -i ./package_setup.sh || :
         ;;
         5)
         info "Running install_zisk_bin.sh..."
